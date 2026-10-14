@@ -66,6 +66,7 @@ export function Footer({ school }: { school?: School }) {
               </>
             ) : (
               <>
+                <li><Link className="link-u hover:text-bone" href="/about/">About Varsity Reach</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/family/">Parents and athletes</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/scout/">College coaches</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/media/">Photographers</Link></li>

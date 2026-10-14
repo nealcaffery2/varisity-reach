@@ -5,7 +5,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const FILES = ['consensus.ts', 'gold-card.ts'];
+const FILES = ['consensus.ts', 'gold-card.ts', 'recruiting-rules.ts', 'feeds.ts'];
 const HEADER = '// GENERATED from lib/ by tools/sync-functions.ts. Edit the lib/ copy, then run `pnpm sync:functions`.\n';
 const check = process.argv.includes('--check');
 let drift = 0;

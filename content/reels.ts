@@ -5,7 +5,7 @@ import type { Reel } from '@/lib/types';
 // public/media/reels, or any direct video URL from Hudl or a phone upload.
 const PEXELS = 'Stock clip via Pexels';
 
-const r = (id: string, sport: string, athlete: string | undefined, title: string, date: string): Reel => ({
+const r = (id: string, sport: string, athlete: string | undefined, title: string, date: string, audience: Reel['audience'] = 'public'): Reel => ({
   id,
   src: `/media/reels/${id}.mp4`,
   poster: `/media/reels/${id}.jpg`,
@@ -14,6 +14,7 @@ const r = (id: string, sport: string, athlete: string | undefined, title: string
   title,
   date,
   credit: PEXELS,
+  audience,
 });
 
 export const reels: Reel[] = [
@@ -24,11 +25,15 @@ export const reels: Reel[] = [
   r('r16', 'girls-tennis', 'reese-kirchner', 'No. 1 singles, serve plus one', '2026-09-22'),
   r('r11', 'girls-basketball', 'kaylee-schaefer', 'And-one through contact', '2026-01-30'),
   r('r13', 'track-and-field', 'owen-fesser', 'Lane 4 finish, 400 relay anchor', '2026-04-25'),
-  r('r15', 'wrestling', 'grady-luebbert', 'Mat return off the whistle', '2026-02-07'),
+  r('r15', 'wrestling', 'grady-luebbert', 'Mat return off the whistle', '2026-02-07', 'recruiters'),
   r('r3', 'girls-flag-football', 'brooklyn-haller', 'Pick six, flag football opener', '2026-09-03'),
   r('r6', 'boys-soccer', 'jace-wernsing', 'Breakaway finish near post', '2026-09-18'),
   r('r17', 'boys-tennis', 'ty-roesch', 'Crosscourt winner on break point', '2026-04-11'),
-  r('r2', 'football', 'avery-niehaus', 'Senior night at the Sports Complex', '2026-10-02'),
+  r('r2', 'football', 'avery-niehaus', 'Senior night at the Sports Complex', '2026-10-02', 'recruiters'),
 ];
 
-export const reelById = (id: string) => reels.find((x) => x.id === id);
+/** Clips anyone can see. Recruiter-only clips stay out of public pages and the home page. */
+export const publicReels = reels.filter((x) => x.audience !== 'recruiters');
+
+/** Public clips only, so a recruiter-only clip never lands on a profile, card or home page. */
+export const reelById = (id: string) => publicReels.find((x) => x.id === id);

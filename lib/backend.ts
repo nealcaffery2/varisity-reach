@@ -286,3 +286,15 @@ export async function extractRoster(file: { name: string; mediaType: string; bas
   if (error) throw new Error(error.message);
   return data as { athletes: unknown[]; notes?: string };
 }
+
+/** Demo-mode storage for the other backend modules (lib/community.ts). */
+export const localRead = read;
+export const localWrite = write;
+
+/** The signed-in user's id, or null. Demo mode has no accounts. */
+export async function userId(): Promise<string | null> {
+  const sb = supabase();
+  if (!sb) return null;
+  const { data } = await sb.auth.getUser();
+  return data.user?.id ?? null;
+}

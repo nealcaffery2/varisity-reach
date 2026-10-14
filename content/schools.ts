@@ -25,6 +25,8 @@ export const schools: School[] = [
     phone: '217-532-2841',
     athleticDirector: 'Aaron Duff',
     recruitingEmail: 'aduff@hillsboroschools.net',
+    // IHSA school directory, April 2026.
+    enrollment: 427,
     links: {
       district: 'https://www.hillsboroschools.net',
       athletics: 'https://hhs.hillsboroschools.net/athletics',

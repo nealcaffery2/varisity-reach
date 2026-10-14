@@ -8,6 +8,8 @@ import { reelById } from '@/content/reels';
 import { platform } from '@/content/platform';
 import { schoolBySlug, schoolTheme, mustSchool } from '@/content/schools';
 import { ShareBar } from '@/components/share-bar';
+import { RecruiterTools } from '@/components/recruiter/recruiter-tools';
+import { Wishlist } from '@/components/athlete/wishlist';
 import { AutoplayVideo } from '@/components/autoplay-video';
 import { Reveal } from '@/components/reveal';
 import { feetInches, formatStat, gpa } from '@/lib/format';
@@ -78,7 +80,7 @@ export default async function AthletePage({ params }: Props) {
         </span>
         <div className="wrap relative grid gap-10 pb-12 lg:grid-cols-[1fr_22rem] lg:items-end lg:gap-16">
           <div>
-            <Link href="/athletes/" className="no-print inline-flex min-h-11 items-center gap-2 text-sm text-mute hover:text-bone"><ArrowLeft size={16} /> Recruit board</Link>
+            <Link href="/recruits/" className="no-print inline-flex min-h-11 items-center gap-2 text-sm text-mute hover:text-bone"><ArrowLeft size={16} /> Recruit board</Link>
             {a.sample && (
               <p className="mt-4 flex w-fit items-center gap-2 rounded border border-line-2 px-3 py-1.5 text-sm text-mute">
                 <Info size={16} /> Sample profile. The athlete and numbers are made up to show the layout.
@@ -236,7 +238,9 @@ export default async function AthletePage({ params }: Props) {
             ) : (
               <a href={`mailto:${school.recruitingEmail ?? platform.supportEmail}?subject=${encodeURIComponent(contactSubject)}`} className="btn btn-primary mt-5 w-full"><EnvelopeSimple size={18} /> Email the athletic office</a>
             )}
+            <div className="no-print"><RecruiterTools slug={a.slug} school={a.school} coach={a.coach} name={fullName(a)} gradYear={a.gradYear} sport={a.sports[0]} sample={a.sample} /></div>
           </section>
+          <Wishlist slug={a.slug} first={a.first} />
         </aside>
       </div>
 

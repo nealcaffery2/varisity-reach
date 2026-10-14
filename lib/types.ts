@@ -106,6 +106,8 @@ export type Reel = {
   date: string; // ISO
   /** Credit line for stock footage used in the template. */
   credit?: string;
+  /** Recruiters only: the family chose to show this clip to verified college coaches and nobody else. */
+  audience?: 'public' | 'recruiters';
 };
 
 export type NewsItem = {

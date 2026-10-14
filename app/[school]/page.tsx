@@ -17,6 +17,7 @@ import { sportsFor } from '@/content/sports';
 import { schoolBySlug } from '@/content/schools';
 import { campaignsFor } from '@/content/fundraising';
 import { CampaignCard } from '@/components/campaign-card';
+import { PlacePhotos } from '@/components/school/place-photos';
 import { dayParts } from '@/lib/format';
 
 type Props = { params: Promise<{ school: string }> };
@@ -61,6 +62,7 @@ export default async function SchoolHome({ params }: Props) {
         label={`${school.name} athletics`}
         sub={`Scores, film and recruiting profiles for every ${school.short.replace(/s$/, '')} at ${school.name}.`}
         reel={hero}
+        image={school.heroImage}
         primary={{ href: `/reels/?school=${school.slug}`, label: 'Watch reels' }}
         secondary={{ href: `/recruits/?school=${school.slug}`, label: 'Recruit board' }}
       />
@@ -113,6 +115,8 @@ export default async function SchoolHome({ params }: Props) {
           </div>
         </section>
       )}
+
+      <PlacePhotos school={school} />
 
       <section className="border-t border-line py-24 md:py-32" aria-labelledby="coaches-h">
         <div className="wrap grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">

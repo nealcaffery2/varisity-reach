@@ -37,6 +37,18 @@ export type SeasonLine = {
 
 export type Classification = '1A' | '2A' | '3A' | '4A' | '5A' | '6A';
 
+/** A photo we are allowed to show, with who took it and on what terms. */
+export type Photo = {
+  src: string;
+  alt: string;
+  caption?: string;
+  credit: string;
+  /** "CC BY-SA 4.0", or "Used with the school's permission". */
+  license: string;
+  /** Where the photo and its license can be checked. */
+  url: string;
+};
+
 export type School = {
   slug: string;
   name: string; // "Hillsboro High School"
@@ -53,6 +65,10 @@ export type School = {
   colors: { accent: string; accent2: string; accentInk: string; accentDeep: string; name: string };
   logo?: string;
   heroReel: string;
+  /** A real photo for the hero. Used instead of the reel, so a real school never opens on stock footage. */
+  heroImage?: Photo;
+  /** Real photos of the school and town, each with its credit and license. */
+  photos?: Photo[];
   rallyCry: string;
   address?: { street: string; city: string; state: string; zip: string };
   phone?: string;

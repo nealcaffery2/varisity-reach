@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, Play } from '@phosphor-icons/react';
 import { asset } from '@/lib/asset';
+import type { Photo } from '@/lib/types';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -16,11 +17,13 @@ type HeroProps = {
   label: string;
   sub: string;
   reel: { src: string; poster: string };
+  /** A real photo shown in place of the reel, credited in the corner. */
+  image?: Photo;
   primary: { href: string; label: string };
   secondary: { href: string; label: string };
 };
 
-export function Hero({ over, word, label, sub, reel, primary, secondary }: HeroProps) {
+export function Hero({ over, word, label, sub, reel, image, primary, secondary }: HeroProps) {
   const WORD = word.toUpperCase();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -32,17 +35,22 @@ export function Hero({ over, word, label, sub, reel, primary, secondary }: HeroP
   return (
     <section ref={ref} className="relative isolate h-[100svh] min-h-[600px] overflow-hidden" aria-label={label}>
       <motion.div style={{ scale }} className="absolute inset-0 -z-10 origin-center">
-        <video
-          className="h-full w-full object-cover grayscale contrast-125 brightness-75"
-          src={asset(reel.src)}
-          poster={asset(reel.poster)}
-          autoPlay={!reduce}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden
-        />
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element -- static export, no image optimizer
+          <img className="h-full w-full object-cover grayscale contrast-125 brightness-75" src={asset(image.src)} alt="" fetchPriority="high" />
+        ) : (
+          <video
+            className="h-full w-full object-cover grayscale contrast-125 brightness-75"
+            src={asset(reel.src)}
+            poster={asset(reel.poster)}
+            autoPlay={!reduce}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden
+          />
+        )}
         {/* Orange duotone: multiply lifts the brand into the highlights without a glow. */}
         <div className="absolute inset-0 bg-accent mix-blend-multiply opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10" />
@@ -93,6 +101,12 @@ export function Hero({ over, word, label, sub, reel, primary, secondary }: HeroP
           </div>
         </motion.div>
       </motion.div>
+
+      {image && (
+        <a href={image.url} className="link-u absolute bottom-6 left-4 text-xs text-bone/70 hover:text-bone md:left-auto md:right-24" target="_blank" rel="noreferrer">
+          Photo: {image.credit}
+        </a>
+      )}
 
       <a href="#highlights" className="absolute bottom-6 right-4 hidden h-11 w-11 items-center justify-center rounded-full border border-line-2 text-mute transition-colors hover:text-bone md:inline-flex md:right-8" aria-label="Scroll to highlights">
         <ArrowDown size={18} />

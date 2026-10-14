@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 };
 
 // Three of the sourced figures from the home page; each links to its source.
+// Schools whose IHSA listing includes colors.
+const WITH_COLORS = directory.schools.filter((s) => s.colors && s.colors.length > 0).length;
+
 const WHY = ['55%', '$4.4B', '20.2'].map((f) => reality.find((r) => r.figure === f)!).filter(Boolean);
 
 const WHO: { name: string; does: string; links: { href: string; label: string }[] }[] = [
@@ -129,7 +132,7 @@ export default function AboutPage() {
           <h2 id="start-h" className="display text-5xl md:text-7xl">Where it <span className="text-accent">started</span></h2>
           <div>
             <p className="max-w-[34rem] text-lg leading-relaxed text-mute">
-              The first school is Hillsboro High in Hillsboro, Illinois: the Hiltoppers, black and orange, in the South Central Conference. Every one of the {directory.count} IHSA member schools is already in the directory with its official colors, ready for an athletic director to claim.
+              The first school is Hillsboro High in Hillsboro, Illinois: the Hiltoppers, black and orange, in the South Central Conference. All {directory.count} IHSA member schools are already in the directory, {WITH_COLORS} of them with their official colors, ready for an athletic director to claim.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/schools/" className="inline-flex min-h-11 items-center gap-2 rounded-sm bg-accent px-5 font-semibold text-accent-ink transition-colors hover:bg-accent-2">

@@ -61,14 +61,18 @@ export function Footer({ school }: { school?: School }) {
                 {school.links.schedules && <li><a className="link-u hover:text-bone" href={school.links.schedules}>Official schedules</a></li>}
                 {school.links.athletics && <li><a className="link-u hover:text-bone" href={school.links.athletics}>Athletics office</a></li>}
                 {school.links.district && <li><a className="link-u hover:text-bone" href={school.links.district}>School district</a></li>}
+                <li><Link className="link-u hover:text-bone" href={`/${school.slug}/claim/`}>Claim this page</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/">{platform.name}</Link></li>
               </>
             ) : (
               <>
+                <li><Link className="link-u hover:text-bone" href="/family/">Parents and athletes</Link></li>
+                <li><Link className="link-u hover:text-bone" href="/scout/">College coaches</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/coach/">Coach dashboard</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/join/">Get verified</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/gold-card/">Gold card</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/schools/">Add your school</Link></li>
+                <li><Link className="link-u hover:text-bone" href="/account/">Notifications</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/sign-in/">Sign in</Link></li>
               </>
             )}

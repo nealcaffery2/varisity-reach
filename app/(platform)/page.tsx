@@ -8,7 +8,7 @@ import { CampaignCard } from '@/components/campaign-card';
 import { Reveal } from '@/components/reveal';
 import { platform } from '@/content/platform';
 import { athletes, athleteBySlug, fullName } from '@/content/athletes';
-import { reels, reelById } from '@/content/reels';
+import { publicReels as reels, reelById } from '@/content/reels';
 import { schools, schoolBySlug, schoolTheme } from '@/content/schools';
 import { underdog } from '@/content/spotlight';
 import { campaigns } from '@/content/fundraising';

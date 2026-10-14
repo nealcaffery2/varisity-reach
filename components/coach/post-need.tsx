@@ -12,6 +12,7 @@ const KINDS = [
   ['equipment', 'Equipment'],
   ['camp', 'Recruiting camps'],
   ['facility', 'Facility'],
+  ['exposure', 'Ads and exposure (highlight videos, ads that reach college coaches)'],
   ['general', 'Something else'],
 ] as const;
 

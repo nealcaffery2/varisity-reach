@@ -1,0 +1,1215 @@
+{
+  "name": "South Central Conference",
+  "sport": "football",
+  "season": "2026-27",
+  "updated": "Oct 13, 11:26 PM",
+  "sourceUrl": "https://www.ihsa.org/sports/football/regular-season/conference-schedules/64?season=2026-27",
+  "retrieved": "2026-10-14",
+  "teams": [
+    {
+      "name": "Carlinville",
+      "ihsaName": "Carlinville",
+      "conf": {
+        "w": 4,
+        "l": 3
+      },
+      "overall": {
+        "w": 4,
+        "l": 4
+      },
+      "oppWins": 42,
+      "pointsFor": 259,
+      "pointsAgainst": 203,
+      "bid": "C",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 20,
+            "against": 48
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 56,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 21,
+            "against": 28
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 28,
+            "against": 20
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": false,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 57,
+            "against": 21
+          }
+        },
+        {
+          "date": "2026-09-26",
+          "time": "1:00",
+          "home": true,
+          "opponent": "Clifton Central",
+          "conference": false,
+          "result": "L",
+          "score": {
+            "for": 18,
+            "against": 36
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 30,
+            "against": 13
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 29,
+            "against": 37
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Pana",
+          "conference": true
+        }
+      ],
+      "nickname": "Cavaliers",
+      "headCoach": "Chad Easterday",
+      "enrollment": 351
+    },
+    {
+      "name": "Gillespie",
+      "ihsaName": "Gillespie",
+      "conf": {
+        "w": 1,
+        "l": 7
+      },
+      "overall": {
+        "w": 1,
+        "l": 7
+      },
+      "oppWins": 38,
+      "pointsFor": 9,
+      "pointsAgainst": 424,
+      "games": [
+        {
+          "date": "2026-08-20",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Forfeit",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 1,
+            "against": 0
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 56
+          }
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 67
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 68
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 58
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 56
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 50
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 8,
+            "against": 69
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": false,
+          "opponent": "North Mac",
+          "conference": true
+        }
+      ],
+      "nickname": "Miners",
+      "headCoach": "Cory Bonstead",
+      "enrollment": 305
+    },
+    {
+      "name": "Greenville",
+      "ihsaName": "Greenville",
+      "conf": {
+        "w": 5,
+        "l": 3
+      },
+      "overall": {
+        "w": 5,
+        "l": 3
+      },
+      "oppWins": 34,
+      "pointsFor": 190,
+      "pointsAgainst": 125,
+      "bid": "C",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": true,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 45,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Litchfield",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 1,
+            "against": 0
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 28,
+            "against": 21
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 14,
+            "against": 35
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 6,
+            "against": 27
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 27,
+            "against": 28
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 50,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 19,
+            "against": 14
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Staunton",
+          "conference": true
+        }
+      ],
+      "nickname": "Comets",
+      "headCoach": "Jim Romack",
+      "enrollment": 444
+    },
+    {
+      "name": "Hillsboro",
+      "ihsaName": "Hillsboro",
+      "conf": {
+        "w": 7,
+        "l": 0
+      },
+      "overall": {
+        "w": 8,
+        "l": 0
+      },
+      "oppWins": 33,
+      "pointsFor": 345,
+      "pointsAgainst": 130,
+      "bid": "R",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 27,
+            "against": 14
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 39,
+            "against": 32
+          }
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 67,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 35,
+            "against": 14
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 42,
+            "against": 22
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": true,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 49,
+            "against": 12
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Lincoln",
+          "conference": false,
+          "result": "W",
+          "score": {
+            "for": 49,
+            "against": 7
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 37,
+            "against": 29
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Piasa Southwestern",
+          "conference": true
+        }
+      ],
+      "nickname": "Hiltoppers",
+      "headCoach": "Joe Reed",
+      "enrollment": 440
+    },
+    {
+      "name": "Litchfield",
+      "ihsaName": "Litchfield [Coop]",
+      "conf": {
+        "w": 0,
+        "l": 5
+      },
+      "overall": {
+        "w": 0,
+        "l": 5
+      },
+      "oppWins": 20,
+      "pointsFor": 0,
+      "pointsAgainst": 5,
+      "games": [
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 1
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 1
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": true,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 1
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 1
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 1
+          },
+          "forfeit": true
+        }
+      ],
+      "nickname": "Purple Panthers",
+      "headCoach": "Colton Faure",
+      "enrollment": 526
+    },
+    {
+      "name": "Pana",
+      "ihsaName": "Pana (H.S.)",
+      "conf": {
+        "w": 6,
+        "l": 2
+      },
+      "overall": {
+        "w": 6,
+        "l": 2
+      },
+      "oppWins": 33,
+      "pointsFor": 231,
+      "pointsAgainst": 107,
+      "bid": "C",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 14,
+            "against": 27
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 19,
+            "against": 18
+          }
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 13,
+            "against": 37
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 68,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 27,
+            "against": 6
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 34,
+            "against": 13
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": false,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 55,
+            "against": 6
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Litchfield",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 1,
+            "against": 0
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Carlinville",
+          "conference": true
+        }
+      ],
+      "nickname": "Panthers",
+      "headCoach": "Mark Ramsey",
+      "enrollment": 375
+    },
+    {
+      "name": "Piasa Southwestern",
+      "ihsaName": "Piasa (Southwestern)",
+      "conf": {
+        "w": 4,
+        "l": 4
+      },
+      "overall": {
+        "w": 4,
+        "l": 4
+      },
+      "oppWins": 35,
+      "pointsFor": 164,
+      "pointsAgainst": 113,
+      "bid": "C",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 14,
+            "against": 13
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 18,
+            "against": 19
+          }
+        },
+        {
+          "date": "2026-09-03",
+          "time": "7:30",
+          "home": false,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 41,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 7,
+            "against": 32
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Litchfield",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 1,
+            "against": 0
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 56,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 13,
+            "against": 30
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 14,
+            "against": 19
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Hillsboro",
+          "conference": true
+        }
+      ],
+      "nickname": "Piasa Birds",
+      "headCoach": "Patrick Keith",
+      "enrollment": 360
+    },
+    {
+      "name": "Staunton",
+      "ihsaName": "Staunton [Coop]",
+      "conf": {
+        "w": 4,
+        "l": 4
+      },
+      "overall": {
+        "w": 4,
+        "l": 4
+      },
+      "oppWins": 35,
+      "pointsFor": 231,
+      "pointsAgainst": 179,
+      "bid": "C",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 13,
+            "against": 14
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": false,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 52,
+            "against": 20
+          }
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Litchfield",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 1,
+            "against": 0
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 20,
+            "against": 28
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 22,
+            "against": 42
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 13,
+            "against": 34
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 41,
+            "against": 33
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 69,
+            "against": 8
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Greenville",
+          "conference": true
+        }
+      ],
+      "nickname": "Bulldogs",
+      "headCoach": "Zachary Klaustermeier",
+      "enrollment": 510
+    },
+    {
+      "name": "Vandalia",
+      "ihsaName": "Vandalia",
+      "conf": {
+        "w": 6,
+        "l": 2
+      },
+      "overall": {
+        "w": 6,
+        "l": 2
+      },
+      "oppWins": 33,
+      "pointsFor": 329,
+      "pointsAgainst": 169,
+      "bid": "C",
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 48,
+            "against": 20
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 32,
+            "against": 39
+          }
+        },
+        {
+          "date": "2026-09-04",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 37,
+            "against": 13
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 32,
+            "against": 7
+          }
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Gillespie",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 58,
+            "against": 0
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 28,
+            "against": 27
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 33,
+            "against": 41
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": true,
+          "opponent": "North Mac",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 61,
+            "against": 22
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Springfield Lanphier",
+          "conference": false
+        }
+      ],
+      "nickname": "Vandals",
+      "headCoach": "Jason Clay",
+      "enrollment": 406
+    },
+    {
+      "name": "North Mac",
+      "ihsaName": "Virden (North Mac)",
+      "conf": {
+        "w": 1,
+        "l": 7
+      },
+      "overall": {
+        "w": 1,
+        "l": 7
+      },
+      "oppWins": 38,
+      "pointsFor": 82,
+      "pointsAgainst": 360,
+      "games": [
+        {
+          "date": "2026-08-21",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Greenville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 45
+          }
+        },
+        {
+          "date": "2026-08-28",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Staunton",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 20,
+            "against": 52
+          }
+        },
+        {
+          "date": "2026-09-03",
+          "time": "7:30",
+          "home": true,
+          "opponent": "Piasa Southwestern",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 0,
+            "against": 41
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Litchfield",
+          "conference": true,
+          "result": "W",
+          "score": {
+            "for": 1,
+            "against": 0
+          },
+          "forfeit": true
+        },
+        {
+          "date": "2026-09-18",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Carlinville",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 21,
+            "against": 57
+          }
+        },
+        {
+          "date": "2026-09-25",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Hillsboro",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 12,
+            "against": 49
+          }
+        },
+        {
+          "date": "2026-10-02",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Pana",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 6,
+            "against": 55
+          }
+        },
+        {
+          "date": "2026-10-09",
+          "time": "7:00",
+          "home": false,
+          "opponent": "Vandalia",
+          "conference": true,
+          "result": "L",
+          "score": {
+            "for": 22,
+            "against": 61
+          }
+        },
+        {
+          "date": "2026-10-16",
+          "time": "7:00",
+          "home": true,
+          "opponent": "Gillespie",
+          "conference": true
+        }
+      ],
+      "nickname": "Panthers",
+      "headCoach": "Nathan Wise",
+      "enrollment": 307
+    }
+  ]
+}

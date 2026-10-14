@@ -12,7 +12,7 @@ import { ReelStrip } from '@/components/reel-strip';
 import { Reveal } from '@/components/reveal';
 import { news, events, tickers } from '@/content/news';
 import { athletesAt } from '@/content/athletes';
-import { reels, reelById } from '@/content/reels';
+import { publicReels as reels, reelById } from '@/content/reels';
 import { sportsFor } from '@/content/sports';
 import { schoolBySlug } from '@/content/schools';
 import { campaignsFor } from '@/content/fundraising';

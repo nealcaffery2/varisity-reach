@@ -5,14 +5,18 @@ Lenis. Content and sample data are TypeScript in `content/`. The live backend
 is Supabase (`supabase/`: migrations, Deno edge functions); `lib/backend.ts`
 is the only door to it and falls back to demo mode when unconfigured.
 
-Routes: `app/(platform)/` is the network (home, recruits, athletes, games,
-spotlight, compare, coach, fundraise, gold-card, schools, join).
-`app/[school]/` is each school's own site, themed by `schoolTheme()`.
+Routes: `app/(platform)/` is the network (home, recruits, scout, athletes,
+games, conference, spotlight, compare, coach, fundraise, gold-card, schools,
+family, account, join). `app/[school]/` also has boosters, community (wants
+board) and claim. `app/[school]/` is each school's own site, themed by
+`schoolTheme()`.
 `app/overlay/` is the bare OBS scoreboard.
 
 Pure logic with tests in `tools/*.test.ts`: filters, consensus scoring,
-streams, fundraising and gold cards, compare, roster parsing. Edge functions
-share `lib/consensus.ts` and `lib/gold-card.ts` through copies in
+streams, fundraising and gold cards, compare, roster parsing, brackets and
+fantasy, school data (IHSA, NCES, feeds), the reel recommender and contact
+calendar, scouting. Edge functions share `lib/consensus.ts`,
+`lib/gold-card.ts`, `lib/recruiting-rules.ts` and `lib/feeds.ts` through copies in
 `supabase/functions/_shared`; run `pnpm sync:functions` after editing them.
 Roster reading calls Claude (`claude-opus-5-5`, structured output) from
 `supabase/functions/roster-import`.
@@ -27,6 +31,10 @@ cd supabase/functions && deno check --config deno.json */index.ts
 
 ## Content
 
+- `content/conference/*.json` from IHSA (`tools/import-ihsa-conference.ts`),
+  `content/directory/il.json` every IHSA school with official colors
+  (`tools/import-ihsa-directory.ts`), `data/nces/il.json` from NCES
+  (`tools/import-nces.ts <ST>`).
 - `content/schools.ts` schools and colors. `content/sports.ts` teams,
   coaches, schedule PDFs. `content/news.ts` stories, tickers and district
   dates. `content/athletes.ts` profiles. `content/reels.ts` clips.

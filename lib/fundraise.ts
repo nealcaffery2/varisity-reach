@@ -11,7 +11,7 @@ export type Campaign = {
   school: string;
   sample: boolean;
   title: string;
-  kind: 'cleats' | 'travel' | 'equipment' | 'camp' | 'facility' | 'general';
+  kind: 'cleats' | 'travel' | 'equipment' | 'camp' | 'facility' | 'exposure' | 'general';
   sport?: string;
   /** What the coach needs, in the coach's words. */
   need: string;

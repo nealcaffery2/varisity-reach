@@ -8,7 +8,7 @@ export function PageHeader({ title, accent, children }: { title: string; accent?
           {title}
           {accent && <span className="text-accent"> {accent}</span>}
         </h1>
-        {children && <div className="mt-6 max-w-2xl text-lg text-mute">{children}</div>}
+        {children && <div className="mt-6 max-w-[36rem] text-lg text-mute">{children}</div>}
       </div>
     </header>
   );

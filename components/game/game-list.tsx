@@ -8,13 +8,16 @@ import { schools, schoolBySlug } from '@/content/schools';
 import { sportBySlug } from '@/content/sports';
 import { sourceLine } from '@/lib/consensus';
 import { useGameBoard } from './game-center';
+import { topSponsors, type Sponsorship } from '@/lib/community';
+import { orderListings } from '@/lib/media';
 import { Scorebug } from './scorebug';
 
-function Tile({ game }: { game: Game }) {
+function Tile({ game, sponsor }: { game: Game; sponsor?: Sponsorship }) {
   const { board } = useGameBoard(game);
   return (
     <li className="min-w-0">
       <Link href={`/games/${game.id}/`} className="group block min-w-0 rounded border border-line p-3 transition-colors hover:border-line-2 hover:bg-ink-2">
+        {sponsor && <p className="mb-2 px-1 text-xs text-mute">Sponsored by <span className="text-bone">{sponsor.sponsor}</span>, for {sponsor.pledge.toLowerCase()}</p>}
         <Scorebug game={game} board={board} compact />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 px-1 text-sm">
           <span className="text-mute">{sportBySlug(game.sport)?.name} · {game.venue}</span>
@@ -29,7 +32,9 @@ const ORDER: Record<Game['status'], number> = { live: 0, scheduled: 1, final: 2 
 
 export function GameList() {
   const [school, setSchool] = useState('');
+  const [sponsors, setSponsors] = useState<Record<string, Sponsorship>>({});
   useEffect(() => {
+    topSponsors().then(setSponsors);
     const sc = new URLSearchParams(window.location.search).get('school');
     // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -71,7 +76,7 @@ export function GameList() {
           gs.length ? (
             <section key={label} className="mt-12" aria-label={label}>
               <h2 className="display text-4xl">{label}</h2>
-              <ul className="mt-5 grid gap-4 lg:grid-cols-2">{gs.map((g) => <Tile key={g.id} game={g} />)}</ul>
+              <ul className="mt-5 grid gap-4 lg:grid-cols-2">{orderListings(gs.map((g) => ({ ...g, gameId: g.id, sponsor: sponsors[g.id] ? { name: sponsors[g.id].sponsor, cents: sponsors[g.id].amountCents, pledge: sponsors[g.id].pledge } : undefined })), new Set()).map((g) => <Tile key={g.id} game={g} sponsor={sponsors[g.id]} />)}</ul>
             </section>
           ) : null,
         )

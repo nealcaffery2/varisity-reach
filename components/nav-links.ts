@@ -7,7 +7,6 @@ export const PLATFORM_NAV: NavLink[] = [
   { href: '/games/', label: 'Games' },
   { href: '/conference/scc/', label: 'Conference' },
   { href: '/reels/', label: 'Reels' },
-  { href: '/stats/', label: 'Stats' },
   { href: '/fundraise/', label: 'Fundraise' },
   { href: '/schools/', label: 'Schools' },
 ];

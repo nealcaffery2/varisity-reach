@@ -65,7 +65,7 @@ export async function saveSquad(conf: string, name: string, squad: Squad): Promi
 
 // ---- viewer -----------------------------------------------------------------------------------
 
-export type Viewer = { role: 'guest' | 'fan' | 'recruiter' | 'parent' | 'athlete' | 'coach' | 'athletic director' | 'reporter'; verified: boolean; name?: string; demo?: true };
+export type Viewer = { role: 'guest' | 'fan' | 'recruiter' | 'parent' | 'athlete' | 'coach' | 'athletic director' | 'reporter'; verified: boolean; name?: string; school?: string; demo?: true };
 
 /** Demo mode lets a visitor try each role from a switcher; live mode reads the verified profile. */
 export async function viewer(): Promise<Viewer> {
@@ -73,8 +73,8 @@ export async function viewer(): Promise<Viewer> {
   if (!sb) return { ...read<Viewer>('vr-demo-viewer', { role: 'guest', verified: false }), demo: true };
   const uid = await userId();
   if (!uid) return { role: 'guest', verified: false };
-  const { data } = await sb.from('profiles').select('role, verified_at, display_name').eq('id', uid).maybeSingle();
-  return { role: (data?.role ?? 'fan') as Viewer['role'], verified: Boolean(data?.verified_at), name: data?.display_name ?? undefined };
+  const { data } = await sb.from('profiles').select('role, verified_at, display_name, school_slug').eq('id', uid).maybeSingle();
+  return { role: (data?.role ?? 'fan') as Viewer['role'], verified: Boolean(data?.verified_at), name: data?.display_name ?? undefined, school: data?.school_slug ?? undefined };
 }
 export const setDemoViewer = (v: Omit<Viewer, 'demo'>) => write('vr-demo-viewer', v);
 
@@ -470,7 +470,6 @@ export const NOTICE_KINDS: { kind: string; label: string }[] = [
   { kind: 'recruiter_feedback', label: 'Recruiter feedback on a reel' },
   { kind: 'film_request', label: 'Film requests (coaches)' },
   { kind: 'grant_deadline', label: 'Grant deadlines near my school' },
-  { kind: 'coverage', label: 'Photo and video requests near me (photographers)' },
 ];
 export const demoPrefs = () => read<Prefs>('vr-prefs', { email: true, sms: false, push: true, muted: [] });
 
@@ -481,6 +480,14 @@ export async function savePrefs(p: Prefs): Promise<Result> {
   if (!uid) return { ok: false, reason: SIGN_IN };
   const { error } = await sb.from('notification_prefs').upsert({ user_id: uid, email: p.email, sms: p.sms, push: p.push, muted: p.muted, updated_at: new Date().toISOString() });
   return error ? { ok: false, reason: error.message } : { ok: true };
+}
+
+/** Saved notification settings. Live mode reads the account's row. */
+export async function getPrefs(): Promise<Prefs> {
+  const { sb, uid } = await signedIn();
+  if (!sb || !uid) return demoPrefs();
+  const { data } = await sb.from('notification_prefs').select('email, sms, push, muted').eq('user_id', uid).maybeSingle();
+  return (data as Prefs | null) ?? { email: true, sms: false, push: true, muted: [] };
 }
 
 /** Turn one kind of notice on or off. Live mode reads the saved row first so other settings are kept. */
@@ -629,8 +636,9 @@ export async function listPledges(school: string, wantIds: string[]): Promise<Wa
   const sb = supabase();
   if (!sb) return demoPledges(school);
   if (!wantIds.length) return [];
-  const { data } = await sb.from('want_pledges').select('want_id, by_kind, name, cents, hours, note').in('want_id', wantIds);
-  return ((data ?? []) as { want_id: string; by_kind: WantPledge['by']; name: string; cents: number | null; hours: number | null; note: string | null }[]).map((r) => ({ wantId: r.want_id, by: r.by_kind, name: r.name, cents: r.cents ?? undefined, hours: r.hours ?? undefined, note: r.note ?? undefined }));
+  // Totals only: who pledged stays between them and the school.
+  const { data } = await sb.from('want_pledge_totals').select('want_id, cents, hours, faculty').in('want_id', wantIds);
+  return ((data ?? []) as { want_id: string; cents: number; hours: number; faculty: boolean }[]).map((r) => ({ wantId: r.want_id, by: r.faculty ? 'faculty' : 'booster', name: '', cents: r.cents, hours: r.hours }));
 }
 
 /** Faculty, boosters, sponsors and families pledge money or hours toward a want. Faculty pledges need a verified staff account. */
@@ -648,6 +656,16 @@ export async function pledgeWant(school: string, p: WantPledge): Promise<Result>
 
 export type CreatorProfile = { name: string; kind: 'photographer' | 'videographer' | 'both'; town: string; miles: number; portfolio?: string; bio?: string };
 export const demoCreator = () => read<CreatorProfile | null>('vr-creator', null);
+
+/** This account's creator profile, if it has one. */
+export async function myCreator(): Promise<CreatorProfile | null> {
+  const { sb, uid } = await signedIn();
+  if (!sb) return demoCreator();
+  if (!uid) return null;
+  const { data } = await sb.from('media_creators').select('display_name, kind, home_town, travel_miles, portfolio_url, bio').eq('user_id', uid).maybeSingle();
+  if (!data) return null;
+  return { name: data.display_name, kind: data.kind, town: data.home_town ?? '', miles: data.travel_miles, portfolio: data.portfolio_url ?? undefined, bio: data.bio ?? undefined };
+}
 
 export async function becomeCreator(c: CreatorProfile): Promise<Result> {
   const { sb, uid } = await signedIn();
@@ -688,13 +706,14 @@ export async function claimCoverage(id: string): Promise<Result> {
     return { ok: true, demo: true };
   }
   if (!uid) return { ok: false, reason: SIGN_IN };
-  const { error } = await sb.from('coverage_requests').update({ status: 'claimed', claimed_by: uid }).eq('id', id).eq('status', 'open');
-  return error ? { ok: false, reason: error.code === '42501' ? 'Set up your photographer profile first.' : error.message } : { ok: true };
+  const { data, error } = await sb.from('coverage_requests').update({ status: 'claimed', claimed_by: uid }).eq('id', id).eq('status', 'open').select('id');
+  if (error) return { ok: false, reason: error.code === '42501' ? 'Set up your photographer profile first.' : error.message };
+  return data?.length ? { ok: true } : { ok: false, reason: 'Someone else took this one a moment ago.' };
 }
 
 export async function buyLicense(itemId: string, use: string, org?: string): Promise<{ ok: true; checkoutUrl?: string; demo?: true } | { ok: false; reason: string }> {
   const sb = supabase();
-  if (!sb) return { ok: true, demo: true };
+  if (!sb) return { ok: false, reason: 'Nothing is sold in this demo.' };
   const { data, error } = await sb.functions.invoke('checkout', { body: { kind: 'license', itemId, use, org, returnUrl: `${window.location.origin}${window.location.pathname}` } });
   if (error) return { ok: false, reason: error.message };
   return { ok: true, checkoutUrl: data.url };
@@ -703,6 +722,16 @@ export async function buyLicense(itemId: string, use: string, org?: string): Pro
 export type AwardEntry = { id: string; award: 'shakiest-camera' | 'loudest-parent'; reelId?: string; caption: string; school?: string; votes: number; at: string; sample?: boolean };
 export const myAwardVotes = (week: string) => read<Record<string, string>>(`vr-award-votes-${week}`, {});
 export const demoEntries = (week: string) => read<AwardEntry[]>(`vr-award-entries-${week}`, []);
+
+/** This week's entries with vote counts. Live mode reads approved entries from the database. */
+export async function listAwardEntries(week: string): Promise<AwardEntry[] | null> {
+  const sb = supabase();
+  if (!sb) return null;
+  const { data } = await sb.from('award_tally').select('id, award, school_slug, reel_id, caption, created_at, votes').eq('week', week);
+  return ((data ?? []) as { id: string; award: AwardEntry['award']; school_slug: string | null; reel_id: string | null; caption: string | null; created_at: string; votes: number }[]).map((r) => ({
+    id: r.id, award: r.award, school: r.school_slug ?? undefined, reelId: r.reel_id ?? undefined, caption: r.caption ?? '', votes: r.votes, at: r.created_at,
+  }));
+}
 
 export async function voteAward(week: string, award: AwardEntry['award'], entryId: string): Promise<Result> {
   const mine = myAwardVotes(week);
@@ -720,7 +749,9 @@ export async function voteAward(week: string, award: AwardEntry['award'], entryI
 export async function enterAward(week: string, e: { award: AwardEntry['award']; reelId?: string; file?: File; caption: string; school?: string; consent: boolean }): Promise<Result> {
   if (!e.consent) return { ok: false, reason: 'The person in the clip has to be in on the joke. Check the box once they said yes.' };
   if (!e.reelId && !e.file) return { ok: false, reason: 'Pick a reel or upload the clip.' };
+  if (e.reelId) e = { ...e, file: undefined };
   const { sb, uid } = await signedIn();
+  if (!sb && e.file) return { ok: false, reason: 'Uploads need the live site. In this demo, nominate a reel that is already here.' };
   if (!sb) {
     write(`vr-award-entries-${week}`, [...demoEntries(week), { id: crypto.randomUUID(), award: e.award, reelId: e.reelId, caption: e.caption, school: e.school, votes: 0, at: new Date().toISOString() }]);
     return { ok: true, demo: true };
@@ -734,4 +765,51 @@ export async function enterAward(week: string, e: { award: AwardEntry['award']; 
   }
   const { error } = await sb.from('award_entries').insert({ award: e.award, week, school_slug: e.school, reel_id: e.reelId, video_path: path, caption: e.caption, submitted_by: uid, consent: true });
   return error ? { ok: false, reason: error.message } : { ok: true };
+}
+
+// ---- media items -----------------------------------------------------------------------------
+
+export type MediaUpload = { school: string; sport?: string; caption: string; original: File; preview: File; studentsShown: boolean; requestId?: string };
+export type MediaItem = { id: string; school: string; sport?: string; caption: string; credit: string; previewUrl: string; studentsShown: boolean; releaseOnFile: boolean };
+
+/**
+ * A creator uploads a full-size photo and the preview the public sees (their
+ * own watermarked or small copy). Nothing shows or sells until staff approve
+ * it, and only staff can record a family's release.
+ */
+export async function uploadMedia(u: MediaUpload): Promise<Result> {
+  if (!u.original.type.startsWith('image/') || !u.preview.type.startsWith('image/')) return { ok: false, reason: 'Photos only for now: upload an image file for both.' };
+  const { sb, uid } = await signedIn();
+  if (!sb) return { ok: false, reason: 'Uploads need the live site. Nothing is sold in this demo.' };
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  const safe = (f: File) => f.name.replace(/[^\w.-]/g, '_');
+  const key = crypto.randomUUID();
+  const original = `${uid}/${key}-${safe(u.original)}`;
+  const preview = `${uid}/${key}-preview-${safe(u.preview)}`;
+  const a = await sb.storage.from('media-originals').upload(original, u.original);
+  if (a.error) return { ok: false, reason: a.error.message };
+  const b = await sb.storage.from('media-previews').upload(preview, u.preview);
+  if (b.error) return { ok: false, reason: b.error.message };
+  const { data: me } = await sb.from('media_creators').select('display_name').eq('user_id', uid).maybeSingle();
+  const { error } = await sb.from('media_items').insert({
+    creator_id: uid, school_slug: u.school, sport: u.sport ?? null, kind: 'photo', original_path: original, preview_path: preview,
+    caption: u.caption, credit_name: me?.display_name ?? 'Photographer', minors_shown: u.studentsShown, request_id: u.requestId ?? null,
+  });
+  return error ? { ok: false, reason: error.code === '42501' ? 'Set up your photographer profile first.' : error.message } : { ok: true };
+}
+
+/** Approved photos for sale, with short-lived preview links. Demo mode has none. */
+export async function listMedia(school?: string): Promise<MediaItem[]> {
+  const sb = supabase();
+  if (!sb) return [];
+  let q = sb.from('media_items').select('id, school_slug, sport, caption, credit_name, preview_path, minors_shown, release_on_file').eq('status', 'approved').eq('kind', 'photo').order('created_at', { ascending: false }).limit(60);
+  if (school) q = q.eq('school_slug', school);
+  const { data } = await q;
+  const rows = (data ?? []) as { id: string; school_slug: string; sport: string | null; caption: string | null; credit_name: string; preview_path: string; minors_shown: boolean; release_on_file: boolean }[];
+  if (!rows.length) return [];
+  const { data: signed } = await sb.storage.from('media-previews').createSignedUrls(rows.map((r) => r.preview_path), 3600);
+  const url = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
+  return rows.filter((r) => url.get(r.preview_path)).map((r) => ({
+    id: r.id, school: r.school_slug, sport: r.sport ?? undefined, caption: r.caption ?? '', credit: r.credit_name, previewUrl: url.get(r.preview_path)!, studentsShown: r.minors_shown, releaseOnFile: r.release_on_file,
+  }));
 }

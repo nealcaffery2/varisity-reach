@@ -71,7 +71,6 @@ export function Footer({ school }: { school?: School }) {
                 <li><Link className="link-u hover:text-bone" href="/media/">Photographers</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/grants/">Grants</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/awards/">Bleacher awards</Link></li>
-                <li><Link className="link-u hover:text-bone" href="/stats/">Stats</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/coach/">Coach dashboard</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/join/">Get verified</Link></li>
                 <li><Link className="link-u hover:text-bone" href="/gold-card/">Gold card</Link></li>

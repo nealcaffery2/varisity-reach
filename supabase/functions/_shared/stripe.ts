@@ -11,10 +11,15 @@ function form(obj: Record<string, unknown>, prefix = ''): string[] {
   });
 }
 
-export async function stripe<T>(path: string, params: Record<string, unknown>): Promise<T> {
+/** POST to Stripe. Pass an idempotency key for anything that moves money, so a retry never pays twice. */
+export async function stripe<T>(path: string, params: Record<string, unknown>, idempotencyKey?: string): Promise<T> {
   const res = await fetch(`${API}${path}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${Deno.env.get('STRIPE_SECRET_KEY')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      Authorization: `Bearer ${Deno.env.get('STRIPE_SECRET_KEY')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+    },
     body: form(params).join('&'),
   });
   const data = await res.json();

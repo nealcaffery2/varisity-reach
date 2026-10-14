@@ -15,8 +15,8 @@ board) and claim. `app/[school]/` is each school's own site, themed by
 Pure logic with tests in `tools/*.test.ts`: filters, consensus scoring,
 streams, fundraising and gold cards, compare, roster parsing, brackets and
 fantasy, school data (IHSA, NCES, feeds), the reel recommender and contact
-calendar, scouting. Edge functions share `lib/consensus.ts`,
-`lib/gold-card.ts`, `lib/recruiting-rules.ts` and `lib/feeds.ts` through copies in
+calendar, scouting, media and grants. Edge functions share `lib/consensus.ts`,
+`lib/gold-card.ts`, `lib/recruiting-rules.ts`, `lib/feeds.ts` and `lib/media.ts` through copies in
 `supabase/functions/_shared`; run `pnpm sync:functions` after editing them.
 Roster reading calls Claude (`claude-opus-5-5`, structured output) from
 `supabase/functions/roster-import`.

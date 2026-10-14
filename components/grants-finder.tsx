@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowSquareOut, BellRinging } from '@phosphor-icons/react';
 import { grants, type Grant } from '@/content/grants';
 import { forPlace, upcoming } from '@/lib/grants';
-import { demoPrefs, setMuted } from '@/lib/community';
+import { getPrefs, setMuted } from '@/lib/community';
 
 const TAGS: { tag: Grant['tags'][number]; label: string }[] = [
   { tag: 'equipment', label: 'Equipment' },
@@ -27,10 +27,11 @@ export function GrantsFinder() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
+    const d = new Date();
     // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAlerts(!demoPrefs().muted.includes('grant_deadline'));
-    setToday(new Date().toISOString().slice(0, 10));
+    setToday(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+    getPrefs().then((p) => setAlerts(!p.muted.includes('grant_deadline')));
   }, []);
 
   const place = { state, county: county.trim() || undefined };
@@ -42,7 +43,7 @@ export function GrantsFinder() {
     const r = await setMuted('grant_deadline', !on);
     if (!r.ok) return setMsg(r.reason);
     setAlerts(on);
-    setMsg(on ? 'Deadline alerts on. Your school’s state and county decide which ones reach you.' : 'Deadline alerts off.');
+    setMsg(on ? 'Deadline alerts on. They show on your account page for your school’s state and county.' : 'Deadline alerts off.');
   };
 
   return (
@@ -62,14 +63,18 @@ export function GrantsFinder() {
         </div>
       </div>
 
-      {soon.length > 0 && (
-        <div className="rounded border border-accent p-5" role="status">
-          <p className="flex items-center gap-2 font-semibold text-bone"><BellRinging size={18} className="text-accent" aria-hidden /> Coming up in the next 60 days</p>
-          <ul className="mt-2 max-w-[30rem] text-sm text-mute">{soon.map((g) => <li key={g.id}><span className="text-bone">{g.org}, {g.name}:</span> {g.cycle}</li>)}</ul>
-          <button type="button" className="btn btn-ghost mt-4" aria-pressed={alerts} onClick={toggleAlerts}><BellRinging size={16} weight={alerts ? 'fill' : 'regular'} /> Deadline alerts</button>
-          <p className="mt-2 min-h-5 text-sm text-mute">{msg}</p>
-        </div>
-      )}
+      <div className="rounded border border-accent p-5">
+        {soon.length > 0 ? (
+          <>
+            <p className="flex items-center gap-2 font-semibold text-bone"><BellRinging size={18} className="text-accent" aria-hidden /> Coming up in the next 60 days</p>
+            <ul className="mt-2 max-w-[30rem] text-sm text-mute">{soon.map((g) => <li key={g.id}><span className="text-bone">{g.org}, {g.name}:</span> {g.cycle}</li>)}</ul>
+          </>
+        ) : (
+          <p className="text-sm text-mute">No dated deadlines in the next 60 days for {county || state}.</p>
+        )}
+        <button type="button" className="btn btn-ghost mt-4" aria-pressed={alerts} onClick={toggleAlerts}><BellRinging size={16} weight={alerts ? 'fill' : 'regular'} /> Deadline alerts</button>
+        <p className="mt-2 min-h-5 max-w-[30rem] text-sm text-mute" role="status">{msg}</p>
+      </div>
 
       {list.length === 0 ? (
         <p className="text-mute">Nothing matches that filter for {county || state}. Try Everything.</p>

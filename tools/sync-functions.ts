@@ -1,6 +1,6 @@
 // Edge functions run on Deno and deploy from supabase/functions only, so the
 // pure libraries they share with the site are copied into _shared. Run after
-// changing lib/consensus.ts or lib/gold-card.ts; `--check` fails CI on drift.
+// changing any file in FILES; `--check` fails CI on drift.
 // Run: npx tsx tools/sync-functions.ts [--check]
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 

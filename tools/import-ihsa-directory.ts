@@ -18,12 +18,16 @@ if (!input || !out) {
 }
 const nces: NationalSchool[] = existsSync('data/nces/il.json') ? JSON.parse(readFileSync('data/nces/il.json', 'utf8')) : [];
 const byKey = new Map(nces.map((n) => [matchKey(n.name, n.town), n]));
+// Fallback: a ZIP with exactly one NCES high school is that school.
+const byZip = new Map<string, NationalSchool[]>();
+for (const n of nces) if (n.zip) byZip.set(n.zip, [...(byZip.get(n.zip) ?? []), n]);
+const onlyInZip = (zip?: string) => (zip && byZip.get(zip)?.length === 1 ? byZip.get(zip)![0] : undefined);
 
 const rows = (JSON.parse(readFileSync(input, 'utf8')) as { data: IhsaApiSchool[] }).data;
 const schools = rows
   .map(fromIhsaApi)
   .map((s) => {
-    const n = byKey.get(matchKey(s.name, s.town));
+    const n = byKey.get(matchKey(s.name, s.town)) ?? onlyInZip(s.zip);
     return { ...s, ncesId: n?.ncesId, website: s.website ?? n?.website, enrollment: s.enrollment ?? n?.enrollment };
   })
   .sort((a, b) => a.ihsaName.localeCompare(b.ihsaName));

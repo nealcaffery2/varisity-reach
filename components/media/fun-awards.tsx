@@ -6,7 +6,7 @@ import { Megaphone, Trophy, Vibrate } from '@phosphor-icons/react';
 import { publicReels } from '@/content/reels';
 import { asset } from '@/lib/asset';
 import { AWARDS, tally, type Award } from '@/lib/media';
-import { demoEntries, enterAward, myAwardVotes, voteAward, type AwardEntry } from '@/lib/community';
+import { demoEntries, enterAward, listAwardEntries, myAwardVotes, voteAward, type AwardEntry } from '@/lib/community';
 
 /** Monday of this week, the award week key. */
 const weekOf = (d = new Date()) => {
@@ -31,20 +31,31 @@ export function FunAwards() {
   const [msg, setMsg] = useState('');
   const [f, setF] = useState({ award: 'shakiest-camera' as Award, reelId: '', caption: '', consent: false });
   const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [formKey, setFormKey] = useState(0);
+  const [live, setLive] = useState(false);
+
+  // Live mode shows real approved entries with everyone's votes; demo mode shows samples plus this browser's entries.
+  const load = async (w: string) => {
+    const real = await listAwardEntries(w);
+    setLive(real !== null);
+    setEntries(real ?? [...SAMPLES, ...demoEntries(w)]);
+  };
 
   useEffect(() => {
     const w = weekOf();
     // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setWeek(w);
-    setEntries([...SAMPLES, ...demoEntries(w)]);
     setMine(myAwardVotes(w));
+    load(w);
   }, []);
 
   const vote = async (e: AwardEntry) => {
     const r = await voteAward(week, e.award, e.id);
     if (!r.ok) return setMsg(r.reason);
     setMine(myAwardVotes(week));
+    if (live) load(week);
   };
 
   return (
@@ -52,10 +63,13 @@ export function FunAwards() {
       <div className="grid gap-10 lg:grid-cols-2">
         {(Object.keys(AWARDS) as Award[]).map((a) => {
           const Icon = ICON[a];
-          const list = tally(
-            Object.entries(mine).filter(([k]) => k === a).map(([, clip]) => ({ voter: 'you', clip })),
-            entries.filter((e) => e.award === a).map((e) => ({ clip: e.id, at: e.at })),
-          );
+          const mineHere = entries.filter((e) => e.award === a);
+          const list = live
+            ? [...mineHere].sort((x, y) => y.votes - x.votes || x.at.localeCompare(y.at)).map((e) => ({ clip: e.id, at: e.at, votes: e.votes }))
+            : tally(
+                Object.entries(mine).filter(([k]) => k === a).map(([, clip]) => ({ voter: 'you', clip })),
+                mineHere.map((e) => ({ clip: e.id, at: e.at })),
+              );
           return (
             <section key={a} aria-labelledby={`aw-${a}`} className="min-w-0">
               <h2 id={`aw-${a}`} className="display flex items-center gap-3 text-4xl md:text-5xl"><Icon size={32} className="text-accent" aria-hidden /> {AWARDS[a].title}</h2>
@@ -79,7 +93,7 @@ export function FunAwards() {
                         <p className="text-bone">{i === 0 && t.votes > 0 && <Trophy size={14} weight="fill" className="mr-1 inline text-accent" aria-label="Leading" />}{e.caption}</p>
                         <p className="text-xs text-dim">{e.sample ? 'Sample entry · ' : ''}<span className="num">{t.votes}</span> vote{t.votes === 1 ? '' : 's'}</p>
                       </div>
-                      <button type="button" className={`btn ${voted ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={voted} disabled={Boolean(mine[a]) && !voted} onClick={() => vote(e)}>{voted ? 'Voted' : 'Vote'}</button>
+                      <button type="button" className={`btn ${voted ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={voted} disabled={Boolean(mine[a])} onClick={() => vote(e)}>{voted ? 'Voted' : 'Vote'}</button>
                     </li>
                   );
                 })}
@@ -91,14 +105,18 @@ export function FunAwards() {
       <p className="min-h-5 text-sm text-mute" role="status">{msg}</p>
 
       <form
+        key={formKey}
         className="grid gap-4 rounded border border-line bg-ink-2 p-6 md:grid-cols-2"
         onSubmit={async (e) => {
           e.preventDefault();
-          const r = await enterAward(week, { award: f.award, reelId: f.reelId || undefined, file: file ?? undefined, caption: f.caption, consent: f.consent });
+          setBusy(true);
+          const r = await enterAward(week, { award: f.award, reelId: f.reelId || undefined, file: f.reelId ? undefined : (file ?? undefined), caption: f.caption, consent: f.consent });
+          setBusy(false);
           if (!r.ok) return setMsg(r.reason);
-          setEntries([...SAMPLES, ...demoEntries(week)]);
+          await load(week);
           setF({ ...f, reelId: '', caption: '', consent: false });
           setFile(null);
+          setFormKey((k) => k + 1);
           setMsg(r.demo ? 'Entered (saved in this browser).' : 'Entered. It shows up once a moderator watches it.');
         }}
       >
@@ -108,7 +126,7 @@ export function FunAwards() {
         {!f.reelId && <div className="md:col-span-2"><label htmlFor="aw-file" className="field-label">Or upload the clip</label><input id="aw-file" type="file" accept="video/*" className="field file:mr-3 file:rounded-sm file:border-0 file:bg-ink-3 file:px-3 file:py-1 file:text-bone" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></div>}
         <div className="md:col-span-2"><label htmlFor="aw-cap" className="field-label">Caption</label><input id="aw-cap" required maxLength={200} className="field" value={f.caption} onChange={(e) => setF({ ...f, caption: e.target.value })} /></div>
         <label className="flex min-h-11 items-start gap-3 text-sm text-bone md:col-span-2"><input type="checkbox" className="mt-0.5 size-5 accent-[var(--color-accent)]" checked={f.consent} onChange={(e) => setF({ ...f, consent: e.target.checked })} /> The person filming or the parent doing the yelling knows and is in on it. No students as the joke.</label>
-        <div className="md:col-span-2"><button className="btn btn-primary">Enter it</button></div>
+        <div className="md:col-span-2"><button className="btn btn-primary" disabled={busy}>{busy ? 'Sending…' : 'Enter it'}</button></div>
       </form>
     </div>
   );

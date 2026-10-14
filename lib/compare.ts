@@ -7,8 +7,10 @@ import { latest } from './stats';
 
 export type CompareSide = {
   label: string;
-  heightIn: number;
-  weightLb: number;
+  /** Missing when the source does not list it. */
+  heightIn?: number;
+  /** Missing when the source does not list it (common for girls' recruiting profiles). */
+  weightLb?: number;
   measurables: Record<string, number>;
   stats: Record<string, number>;
 };
@@ -54,11 +56,14 @@ const edge = (a: number | undefined, b: number | undefined, lowerWins: boolean):
 const fmtMeasure = (label: string, n: number | undefined) =>
   n === undefined ? '–' : /jump|reach/i.test(label) && n > 60 ? `${Math.floor(n / 12)}' ${Math.round((n % 12) * 10) / 10}"` : String(Math.round(n * 100) / 100);
 
+/** 75.5 → 6'3.5" */
+const feetInches = (n: number) => `${Math.floor(n / 12)}'${Math.round((n % 12) * 10) / 10}"`;
+
 export function compareRows(a: CompareSide, b: CompareSide, statKeys: readonly StatKey[]): Row[] {
   const rows: Row[] = [
-    { label: 'Height', a: a.heightIn, b: b.heightIn, aText: `${Math.floor(a.heightIn / 12)}'${a.heightIn % 12}"`, bText: `${Math.floor(b.heightIn / 12)}'${b.heightIn % 12}"`, edge: null },
-    { label: 'Weight', a: a.weightLb, b: b.weightLb, aText: `${a.weightLb} lb`, bText: `${b.weightLb} lb`, edge: null },
   ];
+  if (a.heightIn !== undefined && b.heightIn !== undefined) rows.push({ label: 'Height', a: a.heightIn, b: b.heightIn, aText: feetInches(a.heightIn), bText: feetInches(b.heightIn), edge: null });
+  if (a.weightLb !== undefined && b.weightLb !== undefined) rows.push({ label: 'Weight', a: a.weightLb, b: b.weightLb, aText: `${a.weightLb} lb`, bText: `${b.weightLb} lb`, edge: null });
   const labels = [...new Set([...Object.keys(a.measurables), ...Object.keys(b.measurables)])].filter((l) => a.measurables[l] !== undefined && b.measurables[l] !== undefined);
   for (const l of labels) {
     const x = a.measurables[l];

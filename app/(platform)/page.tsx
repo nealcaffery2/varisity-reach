@@ -30,7 +30,8 @@ export default function PlatformHome() {
   const leaderSchool = schoolBySlug(leader.school)!;
   const featured = [...athletes].sort((a, b) => Number(Boolean(b.verified)) - Number(Boolean(a.verified)) || b.gpa - a.gpa).slice(0, 8);
   const pruitt = athleteBySlug('deshawn-pruitt')!;
-  const rows = compareRows(sideFromAthlete(pruitt), benchmarkById('rb-4star')!, sportBySlug('football')!.statKeys).filter((r) => r.edge !== null).slice(0, 5);
+  const ref = benchmarkById('rb-3star-williams')!;
+  const rows = compareRows(sideFromAthlete(pruitt), ref, sportBySlug('football')!.statKeys).filter((r) => r.edge !== null).slice(0, 5);
 
   return (
     <>
@@ -79,7 +80,7 @@ export default function PlatformHome() {
             <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-3 border-b border-line pb-3 text-sm">
               <span className="font-semibold text-bone">{fullName(pruitt)} <span className="font-normal text-dim">· 2A, 231 students</span></span>
               <span />
-              <span className="text-right text-mute">Sample 4-star RB</span>
+              <span className="text-right text-mute">{ref.label} <span className="text-dim">· {ref.level}, {ref.college}</span></span>
             </div>
             <dl className="divide-y divide-line">
               {rows.map((r, i) => (
@@ -90,7 +91,7 @@ export default function PlatformHome() {
                 </Reveal>
               ))}
             </dl>
-            <p className="mt-3 text-xs text-dim">Sample athlete and sample reference numbers, shown to explain the tool.</p>
+            <p className="mt-3 text-xs text-dim">{fullName(pruitt)} is a sample athlete. {ref.label}’s numbers are a real high school senior season, from <a href={ref.sources[1].url} className="link-u hover:text-bone" target="_blank" rel="noreferrer">{ref.sources[1].label}</a>.</p>
           </div>
         </div>
       </section>

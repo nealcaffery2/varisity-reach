@@ -2,7 +2,7 @@
 // Run: npx tsx tools/compare.test.ts
 import assert from 'node:assert/strict';
 import { athleteBySlug } from '../content/athletes';
-import { benchmarkById } from '../content/benchmarks';
+import { benchmarks, benchmarkById } from '../content/benchmarks';
 import { sportBySlug } from '../content/sports';
 import { compareRows, measurableNumber, sideFromAthlete, tally } from '../lib/compare';
 
@@ -20,17 +20,33 @@ test('measurable strings to numbers', () => {
   assert.equal(measurableNumber('n/a'), undefined);
 });
 
-test('lower 40 time wins, higher yards win, size has no winner', () => {
+test('higher yards win, size has no winner, missing numbers drop out', () => {
   const a = sideFromAthlete(athleteBySlug('deshawn-pruitt')!);
-  const b = benchmarkById('rb-4star')!;
+  const b = benchmarkById('rb-3star-williams')!;
   const rows = compareRows(a, b, sportBySlug('football')!.statKeys);
   const by = (l: string) => rows.find((r) => r.label === l)!;
-  assert.equal(by('40 yd').edge, 'a'); // 4.47 vs 4.52
-  assert.equal(by('Rushing yards').edge, 'a');
+  assert.equal(by('Rushing yards').edge, 'b'); // 2,311 vs 2,368
+  assert.equal(by('Rushing touchdowns').edge, 'a'); // 31 vs 28
   assert.equal(by('Weight').edge, null);
+  assert.ok(!rows.some((r) => r.label === '40 yd')); // no verified 40 on the reference side
   assert.ok(!rows.some((r) => r.label === 'Passing yards'));
-  const t = tally(rows);
-  assert.ok(t.a > t.b);
+});
+
+test('lower times win; a side without height or weight skips those rows', () => {
+  const a = { label: 'A', heightIn: 70, measurables: { '40 yd': 4.47 }, stats: { m100: 10.9 } };
+  const b = { label: 'B', measurables: { '40 yd': 4.52 }, stats: { m100: 10.47 } };
+  const rows = compareRows(a, b, sportBySlug('track-and-field')!.statKeys);
+  assert.equal(rows.find((r) => r.label === '40 yd')!.edge, 'a');
+  assert.equal(rows.find((r) => r.label.startsWith('100 meters'))!.edge, 'b');
+  assert.ok(!rows.some((r) => r.label === 'Height' || r.label === 'Weight'));
+});
+
+test('every reference recruit is real and cites a source', () => {
+  for (const r of benchmarks) {
+    assert.equal(r.sample, false, r.id);
+    assert.ok(r.sources.length > 0 && r.sources.every((s) => s.url.startsWith('https://')), r.id);
+    assert.ok(Object.keys(r.stats).length > 0, r.id);
+  }
 });
 
 console.log(`compare: ${passed} passed`);

@@ -250,11 +250,11 @@ function ReelSlide({ reel, index, active, near, muted, onMute, liked, onLike, re
   const railBtn = 'inline-flex h-12 w-12 items-center justify-center rounded-full bg-ink/50 backdrop-blur transition-transform active:scale-90';
 
   return (
-    <section id={reel.id} data-index={index} style={a && schoolBySlug(a.school) ? (schoolTheme(schoolBySlug(a.school)!) as React.CSSProperties) : undefined} className="relative flex h-[100svh] w-full items-center justify-center overflow-hidden" aria-label={`${a ? fullName(a) + ', ' : ''}${reel.title}`}>
+    <section id={reel.id} data-index={index} style={a && schoolBySlug(a.school) ? (schoolTheme(schoolBySlug(a.school)!) as React.CSSProperties) : undefined} className="relative flex h-full w-full items-center justify-center overflow-hidden" aria-label={`${a ? fullName(a) + ', ' : ''}${reel.title}`}>
       {/* Desktop: blurred poster fills the sides around the 9:16 frame. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={asset(reel.poster)} alt="" aria-hidden className="absolute inset-0 hidden h-full w-full scale-110 object-cover opacity-40 blur-2xl md:block" />
-      <div className="relative h-full w-full md:aspect-[9/16] md:h-[calc(100svh-2rem)] md:w-auto md:overflow-hidden md:rounded">
+      <div className="relative h-full w-full md:aspect-[9/16] md:h-[calc(100%-2rem)] md:w-auto md:overflow-hidden md:rounded">
         <video
           ref={video}
           src={near ? asset(reel.src) : undefined}

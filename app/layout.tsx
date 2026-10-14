@@ -1,14 +1,25 @@
 import type { Metadata, Viewport } from 'next';
-import { Barlow, Big_Shoulders, Geist_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { platform } from '@/content/platform';
 import { Nav } from '@/components/nav';
 import { SmoothScroll } from '@/components/smooth-scroll';
 import { asset } from '@/lib/asset';
 import './globals.css';
 
-const display = Big_Shoulders({ subsets: ['latin'], weight: ['700', '800', '900'], variable: '--font-big-shoulders', display: 'swap' });
-const sans = Barlow({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-barlow', display: 'swap' });
-const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+// Fonts ship with the repo (latin subsets from Google Fonts, OFL) so builds
+// never depend on reaching fonts.googleapis.com.
+const display = localFont({ src: [{ path: './fonts/big-shoulders-var.woff2', weight: '700 900' }], variable: '--font-big-shoulders', display: 'swap' });
+const sans = localFont({
+  src: [
+    { path: './fonts/barlow-400.woff2', weight: '400' },
+    { path: './fonts/barlow-500.woff2', weight: '500' },
+    { path: './fonts/barlow-600.woff2', weight: '600' },
+    { path: './fonts/barlow-700.woff2', weight: '700' },
+  ],
+  variable: '--font-barlow',
+  display: 'swap',
+});
+const mono = localFont({ src: [{ path: './fonts/geist-mono-var.woff2', weight: '100 900' }], variable: '--font-geist-mono', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(platform.url),

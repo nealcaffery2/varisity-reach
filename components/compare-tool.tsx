@@ -103,6 +103,7 @@ export function CompareTool() {
             <div>
               <Link href={`/athletes/${athlete.slug}/`} className="display text-3xl text-bone hover:text-accent sm:text-4xl md:text-6xl">{fullName(athlete)}</Link>
               <p className="mt-1 text-sm text-mute">{school?.name} · {school?.classification}{school?.enrollment ? ` · ${school.enrollment} students` : ''}</p>
+              {athlete.sample && <p className="mt-1 text-sm text-dim">Sample athlete</p>}
             </div>
             <p className="display whitespace-nowrap pb-1 text-center text-4xl md:text-7xl" aria-label={`${score.a} to ${score.b}`}>
               <span className="text-accent">{score.a}</span>
@@ -159,7 +160,7 @@ export function CompareTool() {
             <span>
               {other.ref ? (
                 <>
-                  {other.ref.label}: Class of 2025, high school senior season{other.ref.note ? `. ${other.ref.note}` : ''}. Sources:{' '}
+                  {other.ref.label}: Class of 2025, high school senior season{other.ref.note ? `. ${other.ref.note.replace(/\.$/, '')}` : ''}. Sources:{' '}
                   {other.ref.sources.map((src, i) => (
                     <span key={src.url}>{i > 0 && ', '}<a href={src.url} target="_blank" rel="noreferrer" className="link-u text-mute hover:text-bone">{src.label}</a></span>
                   ))}

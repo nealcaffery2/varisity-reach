@@ -15,7 +15,7 @@ export default function MediaPage() {
       <section className="border-t border-line py-14" aria-labelledby="lic-h">
         <div className="wrap">
           <h2 id="lic-h" className="display text-5xl md:text-7xl">Licenses</h2>
-          <p className="mt-4 max-w-[34rem] text-mute">The photographer keeps the copyright. A family, the school, a newspaper or a sponsor buys the right to use a shot. Every use carries the credit line, and commercial use of a student needs the family’s release first.</p>
+          <p className="mt-4 max-w-[34rem] text-mute">The photographer keeps the copyright. A family, the school, a newspaper or a sponsor buys the right to use a shot. Every use carries a credit line, and commercial use of a student needs the family’s release first.</p>
           <div className="mt-8"><LicenseTable /></div>
         </div>
       </section>

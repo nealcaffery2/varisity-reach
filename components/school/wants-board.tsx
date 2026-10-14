@@ -88,12 +88,12 @@ export function WantsBoard({ school, town, short, sports, starters }: Props) {
                       const pr = pledgeProgress(w.estCents, mine);
                       return (
                         <p className="mt-2 text-sm text-bone">
-                          <HandCoins size={14} className="inline text-accent" aria-hidden /> Pledged{pr.cents ? ` $${Math.round(pr.cents / 100).toLocaleString()}` : ''}{pr.hours ? `${pr.cents ? ' and' : ''} ${pr.hours} volunteer hours` : ''}{pr.pct !== undefined ? ` (${pr.pct}% of the cost)` : ''}
+                          <HandCoins size={14} className="inline text-accent" aria-hidden /> Pledged{pr.cents ? ` $${Math.round(pr.cents / 100).toLocaleString()}` : ''}{pr.hours ? `${pr.cents ? ' and' : ''} ${pr.hours} volunteer hours` : ''}{pr.cents > 0 && pr.pct !== undefined ? ` (${pr.pct}% of the cost)` : ''}
                           {pr.faculty && <span className="ml-2 rounded-sm bg-accent px-1.5 text-xs font-semibold text-accent-ink">Faculty pledged</span>}
                         </p>
                       );
                     })()}
-                    {pledging === w.id ? (
+                    {w.status !== 'open' ? null : pledging === w.id ? (
                       <form
                         className="mt-3 grid gap-2 rounded-sm bg-ink-2 p-3 sm:grid-cols-2"
                         onSubmit={async (e) => {
@@ -110,7 +110,7 @@ export function WantsBoard({ school, town, short, sports, starters }: Props) {
                         <div className="flex gap-2 sm:col-span-2"><button className="btn btn-primary">Pledge</button><button type="button" className="btn btn-ghost" onClick={() => setPledging('')}>Cancel</button></div>
                       </form>
                     ) : (
-                      <button type="button" className="link-u mt-2 inline-flex min-h-8 items-center gap-1 text-sm text-mute hover:text-bone" onClick={() => setPledging(w.id)}><HandCoins size={14} aria-hidden /> Pledge money or hours</button>
+                      <button type="button" className="link-u mt-2 inline-flex min-h-11 items-center gap-1 text-sm text-mute hover:text-bone" onClick={() => setPledging(w.id)}><HandCoins size={14} aria-hidden /> Pledge money or hours</button>
                     )}
                     <div className="mt-2 flex flex-wrap gap-x-4 text-xs text-dim">
                       <a className="link-u inline-flex min-h-8 items-center gap-1 hover:text-bone" target="_blank" rel="noreferrer" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window === 'undefined' ? '' : pageUrl())}&quote=${encodeURIComponent(shareText(w))}`}><FacebookLogo size={14} aria-hidden /> Facebook</a>

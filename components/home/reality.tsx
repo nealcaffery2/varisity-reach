@@ -31,8 +31,8 @@ export function Reality() {
             <li key={f.figure} className="flex flex-col bg-ink p-6">
               <p className="display text-6xl text-accent md:text-7xl">{f.figure}</p>
               <p className="mt-3 flex-1 text-bone">{f.claim}</p>
-              <a href={f.url} target="_blank" rel="noreferrer" className="link-u mt-4 inline-flex items-start gap-1 self-start text-xs text-dim hover:text-mute">
-                {f.source}, {f.year} <ArrowSquareOut size={11} className="mt-0.5 shrink-0" aria-label="opens in a new tab" />
+              <a href={f.url} target="_blank" rel="noreferrer" className="link-u mt-2 inline-flex min-h-11 items-center gap-1 self-start py-2 text-xs text-dim hover:text-mute">
+                {f.source}, {f.year} <ArrowSquareOut size={11} className="shrink-0" aria-label="opens in a new tab" />
               </a>
             </li>
           ))}

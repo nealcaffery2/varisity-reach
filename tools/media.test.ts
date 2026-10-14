@@ -11,10 +11,13 @@ const test = (name: string, fn: () => void) => {
   try { fn(); passed++; } catch (e) { console.error('FAIL', name); throw e; }
 };
 
-test('a sale splits to photographer, team fund and fees, adding up', () => {
+test('a sale pays card fees first, then splits photographer and team fund, adding up', () => {
   const s = split(2500);
-  assert.deepEqual(s, { creator: 1875, school: 500, fees: 125 });
+  assert.deepEqual(s, { creator: 1894, school: 503, fees: 103 });
   assert.equal(s.creator + s.school + s.fees, 2500);
+  const small = split(500);
+  assert.equal(small.fees, 45);
+  assert.ok(small.creator > 0 && small.school > 0 && small.creator + small.school + small.fees === 500);
 });
 
 test('commercial use of minors needs a release; editorial does not', () => {

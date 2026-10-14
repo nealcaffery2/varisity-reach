@@ -12,10 +12,17 @@ create table if not exists public.media_creators (
   travel_miles int not null default 30,
   portfolio_url text,
   bio text check (length(bio) <= 500),
-  -- Stripe Connect account that receives the creator's share of each license.
-  stripe_account text,
   verified_at timestamptz,
   created_at timestamptz not null default now()
+);
+
+-- Stripe Connect account that receives a creator's share of each license.
+-- Kept apart from the public profile: RLS on with no policies, so only the
+-- service role (checkout and the webhook) can read or write it.
+create table if not exists public.media_creator_payouts (
+  user_id uuid primary key references public.media_creators(user_id) on delete cascade,
+  stripe_account text not null,
+  updated_at timestamptz not null default now()
 );
 
 -- A coach (or AD) asks for someone to shoot a game.
@@ -154,6 +161,7 @@ create or replace view public.award_tally with (security_invoker = false) as
 -- ---- row level security ---------------------------------------------------------------------
 
 alter table public.media_creators enable row level security;
+alter table public.media_creator_payouts enable row level security;
 alter table public.coverage_requests enable row level security;
 alter table public.media_items enable row level security;
 alter table public.media_licenses enable row level security;
@@ -167,7 +175,7 @@ alter table public.award_votes enable row level security;
 drop policy if exists "creators public" on public.media_creators;
 create policy "creators public" on public.media_creators for select using (true);
 drop policy if exists "own creator profile" on public.media_creators;
-create policy "own creator profile" on public.media_creators for insert with check (user_id = auth.uid() and verified_at is null and stripe_account is null);
+create policy "own creator profile" on public.media_creators for insert with check (user_id = auth.uid() and verified_at is null);
 drop policy if exists "edit creator profile" on public.media_creators;
 create policy "edit creator profile" on public.media_creators for update using (user_id = auth.uid());
 
@@ -213,7 +221,9 @@ drop policy if exists "pledges public" on public.want_pledges;
 create policy "pledges public" on public.want_pledges for select using (true);
 drop policy if exists "make a pledge" on public.want_pledges;
 create policy "make a pledge" on public.want_pledges for insert with check (
-  user_id = auth.uid() and (by_kind <> 'faculty' or public.is_school_staff((select school_slug from public.school_wants w where w.id = want_id)))
+  user_id = auth.uid()
+  and exists (select 1 from public.school_wants w where w.id = want_id and w.status = 'open')
+  and (by_kind <> 'faculty' or public.is_school_staff((select school_slug from public.school_wants w where w.id = want_id)))
 );
 
 drop policy if exists "approved entries public" on public.award_entries;

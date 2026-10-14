@@ -483,6 +483,24 @@ export async function savePrefs(p: Prefs): Promise<Result> {
   return error ? { ok: false, reason: error.message } : { ok: true };
 }
 
+/** Turn one kind of notice on or off. Live mode reads the saved row first so other settings are kept. */
+export async function setMuted(kind: string, muted: boolean): Promise<Result> {
+  const local = demoPrefs();
+  const apply = (p: Prefs): Prefs => ({ ...p, muted: muted ? [...new Set([...p.muted, kind])] : p.muted.filter((m) => m !== kind) });
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write('vr-prefs', apply(local));
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  const { data } = await sb.from('notification_prefs').select('email, sms, push, muted').eq('user_id', uid).maybeSingle();
+  const next = apply((data as Prefs | null) ?? { email: true, sms: false, push: true, muted: [] });
+  const { error } = await sb.from('notification_prefs').upsert({ user_id: uid, ...next, updated_at: new Date().toISOString() });
+  if (error) return { ok: false, reason: error.message };
+  write('vr-prefs', apply(local));
+  return { ok: true };
+}
+
 // ---- school wants board -----------------------------------------------------------------------
 
 export type Want = { id: string; school: string; sport?: string; title: string; detail?: string; estCents?: number; votes: number; status: string };
@@ -547,9 +565,10 @@ export const demoPartnerLinks = (gameId: string) => read<PartnerLink[]>(`vr-part
 
 export async function listPartnerLinks(gameId: string): Promise<PartnerLink[]> {
   const sb = supabase();
-  if (!sb) return demoPartnerLinks(gameId);
+  const https = (l: PartnerLink) => /^https:\/\//i.test(l.url);
+  if (!sb) return demoPartnerLinks(gameId).filter(https);
   const { data } = await sb.from('game_partner_links').select('kind, url, media_partners(name)').eq('game_id', gameId);
-  return ((data ?? []) as unknown as { kind: PartnerLink['kind']; url: string; media_partners: { name: string } | null }[]).map((r) => ({ gameId, partner: r.media_partners?.name ?? 'Partner', kind: r.kind, url: r.url }));
+  return ((data ?? []) as unknown as { kind: PartnerLink['kind']; url: string; media_partners: { name: string } | null }[]).map((r) => ({ gameId, partner: r.media_partners?.name ?? 'Partner', kind: r.kind, url: r.url })).filter(https);
 }
 
 /** A paper, radio station, school or coach links its broadcast or recap to a game. */
@@ -573,6 +592,21 @@ export async function addPartnerLink(l: PartnerLink & { partnerKind: 'newspaper'
 
 export type Sponsorship = { gameId: string; school: string; sponsor: string; amountCents: number; pledge: string; wantId?: string };
 export const demoSponsors = () => read<Sponsorship[]>('vr-sponsors', []);
+
+/** The biggest paid sponsor per game. Live mode reads paid rows from the database. */
+export async function topSponsors(): Promise<Record<string, Sponsorship>> {
+  const sb = supabase();
+  let list: Sponsorship[] = demoSponsors();
+  if (sb) {
+    const { data } = await sb.from('game_sponsors').select('game_id, school_slug, sponsor_name, cents, pledge, want_id').eq('status', 'paid');
+    list = ((data ?? []) as { game_id: string; school_slug: string; sponsor_name: string; cents: number; pledge: string; want_id: string | null }[]).map((r) => ({
+      gameId: r.game_id, school: r.school_slug, sponsor: r.sponsor_name, amountCents: r.cents, pledge: r.pledge, wantId: r.want_id ?? undefined,
+    }));
+  }
+  const top: Record<string, Sponsorship> = {};
+  for (const s of list) if (!top[s.gameId] || top[s.gameId].amountCents < s.amountCents) top[s.gameId] = s;
+  return top;
+}
 
 /** Sponsor a game: top of the watch list, money to the school, for the thing the school pledged. */
 export async function sponsorGame(s: Sponsorship): Promise<{ ok: true; checkoutUrl?: string; demo?: true } | { ok: false; reason: string }> {
@@ -672,8 +706,8 @@ export const demoEntries = (week: string) => read<AwardEntry[]>(`vr-award-entrie
 
 export async function voteAward(week: string, award: AwardEntry['award'], entryId: string): Promise<Result> {
   const mine = myAwardVotes(week);
-  if (mine[award]) return { ok: false, reason: 'One vote per award each week.' };
   const { sb, uid } = await signedIn();
+  if (!sb && mine[award]) return { ok: false, reason: 'One vote per award each week.' };
   if (sb) {
     if (!uid) return { ok: false, reason: 'Sign in to vote, so every person counts once.' };
     const { error } = await sb.from('award_votes').insert({ voter_id: uid, award, week, entry_id: entryId });

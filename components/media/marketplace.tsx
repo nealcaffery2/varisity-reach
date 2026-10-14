@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Camera, MapPin, VideoCamera } from '@phosphor-icons/react';
 import { schools, schoolBySlug } from '@/content/schools';
 import { sportBySlug, sportsFor } from '@/content/sports';
-import { LICENSES, split, type LicenseUse } from '@/lib/media';
+import { LICENSES, creditLine, split, type LicenseUse } from '@/lib/media';
 import { becomeCreator, claimCoverage, demoCreator, listCoverage, requestCoverage, viewer, type Coverage, type CreatorProfile, type Viewer } from '@/lib/community';
 
 const money = (c: number) => `$${(c / 100).toFixed(c % 100 ? 2 : 0)}`;
@@ -34,6 +34,7 @@ export function LicenseTable() {
           })}
         </tbody>
       </table>
+      <p className="border-t border-line px-3 py-3 text-sm text-mute">Shares are after card fees. Every licensed use carries the credit line, for example: <span className="text-bone">{creditLine('Jo Lee', 'Hillsboro High School')}</span></p>
     </div>
   );
 }

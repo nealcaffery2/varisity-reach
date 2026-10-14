@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowSquareOut, BellRinging } from '@phosphor-icons/react';
 import { grants, type Grant } from '@/content/grants';
 import { forPlace, upcoming } from '@/lib/grants';
-import { demoPrefs, savePrefs } from '@/lib/community';
+import { demoPrefs, setMuted } from '@/lib/community';
 
 const TAGS: { tag: Grant['tags'][number]; label: string }[] = [
   { tag: 'equipment', label: 'Equipment' },
@@ -38,11 +38,11 @@ export function GrantsFinder() {
   const soon = today ? upcoming(grants, place, today, 60) : [];
 
   const toggleAlerts = async () => {
-    const p = demoPrefs();
     const on = !alerts;
-    const r = await savePrefs({ ...p, muted: on ? p.muted.filter((m) => m !== 'grant_deadline') : [...p.muted, 'grant_deadline'] });
+    const r = await setMuted('grant_deadline', !on);
+    if (!r.ok) return setMsg(r.reason);
     setAlerts(on);
-    setMsg(r.ok ? (on ? `You’ll hear about deadlines for ${county || state} schools.` : 'Grant alerts off.') : r.reason);
+    setMsg(on ? 'Deadline alerts on. Your school’s state and county decide which ones reach you.' : 'Deadline alerts off.');
   };
 
   return (
@@ -66,7 +66,7 @@ export function GrantsFinder() {
         <div className="rounded border border-accent p-5" role="status">
           <p className="flex items-center gap-2 font-semibold text-bone"><BellRinging size={18} className="text-accent" aria-hidden /> Coming up in the next 60 days</p>
           <ul className="mt-2 max-w-[30rem] text-sm text-mute">{soon.map((g) => <li key={g.id}><span className="text-bone">{g.org}, {g.name}:</span> {g.cycle}</li>)}</ul>
-          <button type="button" className="btn btn-ghost mt-4" aria-pressed={alerts} onClick={toggleAlerts}><BellRinging size={16} /> {alerts ? 'Alerts on' : 'Alert me'}</button>
+          <button type="button" className="btn btn-ghost mt-4" aria-pressed={alerts} onClick={toggleAlerts}><BellRinging size={16} weight={alerts ? 'fill' : 'regular'} /> Deadline alerts</button>
           <p className="mt-2 min-h-5 text-sm text-mute">{msg}</p>
         </div>
       )}
@@ -84,6 +84,7 @@ export function GrantsFinder() {
                 <dt className="text-dim">Who</dt><dd className="text-bone">{g.who}</dd>
                 {g.award && <><dt className="text-dim">Award</dt><dd className="text-bone">{g.award}</dd></>}
                 <dt className="text-dim">When</dt><dd className="text-bone">{g.cycle}</dd>
+                {g.fit && <><dt className="text-dim">Check</dt><dd className="text-bone">{g.fit}</dd></>}
               </dl>
               <a className="btn btn-ghost mt-4 self-start" href={g.url} target="_blank" rel="noreferrer">Official page <ArrowSquareOut size={14} aria-hidden /></a>
             </li>

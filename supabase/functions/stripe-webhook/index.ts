@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     // Pay out only the first time this session is seen.
     if (lic?.length && item) {
       const pi = await stripeGet<{ latest_charge: string }>(`/payment_intents/${s.payment_intent}`);
-      const { data: creator } = await db.from('media_creators').select('stripe_account').eq('user_id', item.creator_id).maybeSingle();
+      const { data: creator } = await db.from('media_creator_payouts').select('stripe_account').eq('user_id', item.creator_id).maybeSingle();
       const { data: school } = await db.from('schools').select('stripe_account').eq('slug', item.school_slug).maybeSingle();
       if (creator?.stripe_account) await stripe('/transfers', { amount: Number(m.creator_cents), currency: 'usd', destination: creator.stripe_account, source_transaction: pi.latest_charge, transfer_group: `license-${item.id}` });
       if (school?.stripe_account) await stripe('/transfers', { amount: Number(m.school_cents), currency: 'usd', destination: school.stripe_account, source_transaction: pi.latest_charge, transfer_group: `license-${item.id}` });

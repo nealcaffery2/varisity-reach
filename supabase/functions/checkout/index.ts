@@ -1,7 +1,8 @@
 // Opens Stripe Checkout for a gift, a gold card, a photo license or a game
-// sponsorship. Money is a destination
-// charge to the school's (or booster club's) connected account, so funds land
-// with them; the platform keeps PLATFORM_FEE_PCT (0 by default).
+// sponsorship. Gifts, gold cards and sponsorships are destination charges to
+// the school's (or booster club's) connected account, so funds land with them;
+// the platform keeps PLATFORM_FEE_PCT (0 by default). Photo licenses are
+// collected by the platform and split by transfer in the webhook.
 import { admin, fail, json, serve } from '../_shared/http.ts';
 import { stripe } from '../_shared/stripe.ts';
 import { LICENSES, canLicense, split, type LicenseUse } from '../_shared/media.ts';
@@ -56,8 +57,9 @@ serve(async (req) => {
     // pays the photographer and the school their shares.
     const use = String(b.use) as LicenseUse;
     if (!LICENSES[use]) return fail('Pick how you will use the photo.');
-    const { data: item } = await db.from('media_items').select('id, school_slug, caption, credit_name, minors_shown, release_on_file, status, creator_id').eq('id', String(b.itemId)).maybeSingle();
+    const { data: item } = await db.from('media_items').select('id, kind, school_slug, caption, credit_name, minors_shown, release_on_file, status, creator_id').eq('id', String(b.itemId)).maybeSingle();
     if (!item || item.status !== 'approved') return fail('That photo is not for sale.', 404);
+    if (item.kind !== 'photo') return fail('Video licenses are not on sale yet. Photos only for now.', 409);
     const ok = canLicense(use, { minorsShown: item.minors_shown, releaseOnFile: item.release_on_file });
     if (!ok.ok) return fail(ok.reason, 409);
     const price = LICENSES[use].priceCents;

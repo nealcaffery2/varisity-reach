@@ -18,7 +18,7 @@ browser (demo mode) and the pages say so.
 | `functions/roster-import` | Claude reads a roster photo, PDF or Word text into athlete rows (structured output, `claude-opus-5-5`). Verified coaches only. Saves nothing. |
 | `functions/publish-roster` | Saves the rows a coach approved, stamped with who verified them. New athletes stay hidden until a media release is recorded. |
 | `functions/checkout` | Stripe Checkout for gifts, gold cards and game sponsors (destination charges to the school's connected account), and photo licenses (collected by the platform, then split by transfer). |
-| `functions/stripe-webhook` | Records gifts, signs gold cards, marks sponsors paid, and records licenses and pays the photographer (75%) and the school (20%) by transfer. A creator without a connected Stripe account is paid once they add one. |
+| `functions/stripe-webhook` | Records gifts, signs gold cards, marks sponsors paid, and records licenses and after card fees, pays the photographer (79%) and the school (21%) by transfer. Payout account ids live in `media_creator_payouts`, readable by the service role only. |
 | `functions/gold-card-claim`, `gold-card-verify` | Hand the buyer their card; check a card for a merchant. The signing key never leaves the server. |
 | `functions/_shared` | Plumbing, a small Stripe client, and copies of `lib/consensus.ts` and `lib/gold-card.ts` (`pnpm sync:functions` keeps them in step; CI fails on drift). |
 

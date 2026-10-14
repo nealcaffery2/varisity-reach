@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowSquareOut, Megaphone, Radio } from '@phosphor-icons/react';
-import { addPartnerLink, demoSponsors, listPartnerLinks, sponsorGame, type PartnerLink, type Sponsorship } from '@/lib/community';
+import { starterWants } from '@/content/wants';
+import { addPartnerLink, listPartnerLinks, listWants, sponsorGame, topSponsors, type PartnerLink, type Sponsorship, type Want } from '@/lib/community';
 
 const KINDS: PartnerLink['kind'][] = ['radio', 'stream', 'live blog', 'recap', 'photos'];
 
@@ -53,19 +54,23 @@ export function PartnerPanel({ gameId }: { gameId: string }) {
   );
 }
 
-const PLEDGES = ['New helmets', 'Practice equipment', 'Bus to the playoff game', 'Film camera and tripod', 'Cleats for kids who need them'];
-
 /** A business sponsors this game: top of the watch list, money to the school for a pledge the school keeps. */
 export function SponsorCard({ gameId, school, schoolName, sample }: { gameId: string; school: string; schoolName: string; sample: boolean }) {
   const [current, setCurrent] = useState<Sponsorship | undefined>();
-  const [f, setF] = useState({ sponsor: '', dollars: '100', pledge: PLEDGES[0] });
+  const [wants, setWants] = useState<Want[]>([]);
+  const [f, setF] = useState({ sponsor: '', dollars: '100', wantId: '' });
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
   useEffect(() => {
-    // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrent(demoSponsors().filter((s) => s.gameId === gameId).sort((a, b) => b.amountCents - a.amountCents)[0]);
-  }, [gameId]);
+    topSponsors().then((t) => setCurrent(t[gameId]));
+    // The school's own open wants are what a sponsorship can pay for.
+    listWants(school, starterWants(school)).then((w) => {
+      const open = w.filter((x) => x.status === 'open');
+      setWants(open);
+      if (open[0]) setF((cur) => ({ ...cur, wantId: cur.wantId || open[0].id }));
+    });
+  }, [gameId, school]);
+  const picked = wants.find((w) => w.id === f.wantId);
 
   return (
     <section className="rounded border border-line p-5" aria-labelledby="sponsor-h">
@@ -73,27 +78,28 @@ export function SponsorCard({ gameId, school, schoolName, sample }: { gameId: st
       {current ? (
         <p className="mt-2 text-sm text-mute"><Megaphone size={14} className="inline text-accent" aria-hidden /> <span className="text-bone">{current.sponsor}</span> put ${Math.round(current.amountCents / 100)} toward {current.pledge.toLowerCase()} for {schoolName}.</p>
       ) : (
-        <p className="mt-2 text-sm text-mute">Your name tops the watch list for this game. Every dollar goes to {schoolName} for the thing you pick below.</p>
+        <p className="mt-2 text-sm text-mute">Your name tops the watch list for this game. Every dollar goes to {schoolName} for an item on its wants board.</p>
       )}
       <form
         className="mt-4 grid gap-3"
         onSubmit={async (e) => {
           e.preventDefault();
           setBusy(true);
-          const r = await sponsorGame({ gameId, school, sponsor: f.sponsor, amountCents: Math.round(Number(f.dollars) * 100), pledge: f.pledge });
+          if (!picked) return setMsg('This school has nothing on its wants board yet.');
+          const r = await sponsorGame({ gameId, school, sponsor: f.sponsor, amountCents: Math.round(Number(f.dollars) * 100), pledge: picked.title, wantId: picked.id });
           setBusy(false);
           if (!r.ok) return setMsg(r.reason);
           if (r.checkoutUrl) return window.location.assign(r.checkoutUrl);
-          setCurrent(demoSponsors().filter((s) => s.gameId === gameId).sort((a, b) => b.amountCents - a.amountCents)[0]);
+          topSponsors().then((t) => setCurrent(t[gameId]));
           setMsg(sample ? 'Sample game: saved in this browser only.' : 'Saved in this browser (demo mode).');
         }}
       >
         <div><label htmlFor="sp-name" className="field-label">Business or family name</label><input id="sp-name" required maxLength={80} className="field" value={f.sponsor} onChange={(e) => setF({ ...f, sponsor: e.target.value })} /></div>
         <div className="grid grid-cols-[6rem_1fr] gap-3">
           <div><label htmlFor="sp-amt" className="field-label">Dollars</label><input id="sp-amt" inputMode="numeric" className="field num" value={f.dollars} onChange={(e) => setF({ ...f, dollars: e.target.value.replace(/\D/g, '') })} /></div>
-          <div><label htmlFor="sp-pledge" className="field-label">Pays for</label><select id="sp-pledge" className="field" value={f.pledge} onChange={(e) => setF({ ...f, pledge: e.target.value })}>{PLEDGES.map((p) => <option key={p}>{p}</option>)}</select></div>
+          <div><label htmlFor="sp-pledge" className="field-label">Pays for</label><select id="sp-pledge" className="field" value={f.wantId} onChange={(e) => setF({ ...f, wantId: e.target.value })} disabled={!wants.length}>{wants.length ? wants.map((w) => <option key={w.id} value={w.id}>{w.title}</option>) : <option value="">Wants board is empty</option>}</select></div>
         </div>
-        <button className="btn btn-primary" disabled={busy}>{busy ? 'Opening checkout…' : 'Sponsor'}</button>
+        <button className="btn btn-primary" disabled={busy || !wants.length}>{busy ? 'Opening checkout…' : 'Sponsor'}</button>
         <p className="min-h-5 text-sm text-mute" role="status">{msg}</p>
       </form>
     </section>

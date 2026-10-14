@@ -8,7 +8,7 @@ import { schools, schoolBySlug } from '@/content/schools';
 import { sportBySlug } from '@/content/sports';
 import { sourceLine } from '@/lib/consensus';
 import { useGameBoard } from './game-center';
-import { demoSponsors, type Sponsorship } from '@/lib/community';
+import { topSponsors, type Sponsorship } from '@/lib/community';
 import { orderListings } from '@/lib/media';
 import { Scorebug } from './scorebug';
 
@@ -34,12 +34,10 @@ export function GameList() {
   const [school, setSchool] = useState('');
   const [sponsors, setSponsors] = useState<Record<string, Sponsorship>>({});
   useEffect(() => {
-    const top: Record<string, Sponsorship> = {};
-    for (const s of demoSponsors()) if (!top[s.gameId] || top[s.gameId].amountCents < s.amountCents) top[s.gameId] = s;
+    topSponsors().then(setSponsors);
+    const sc = new URLSearchParams(window.location.search).get('school');
     // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSponsors(top);
-    const sc = new URLSearchParams(window.location.search).get('school');
     if (sc && schoolBySlug(sc)) setSchool(sc);
   }, []);
   const list = games

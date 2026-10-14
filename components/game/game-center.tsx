@@ -131,7 +131,7 @@ export function GameCenter({ game }: { game: Game }) {
             </details>
           </section>
 
-          {game.home.school && <SponsorCard gameId={game.id} school={game.home.school} schoolName={schoolBySlug(game.home.school)?.name ?? game.home.name} sample={game.sample} />}
+          {game.home.school && !(game.sample && isLive) && <SponsorCard gameId={game.id} school={game.home.school} schoolName={schoolBySlug(game.home.school)?.name ?? game.home.name} sample={game.sample} />}
 
           <OverlayCard gameId={game.id} />
 

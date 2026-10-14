@@ -3,7 +3,8 @@
 //
 // Photographers keep the copyright. A school or news partner buys a license
 // to use a photo; the photographer is paid and credited, and a share goes to
-// the school's team fund.
+// the school's team fund. Card processing comes off the top, so a small sale
+// never costs the platform money.
 
 export type LicenseUse = 'personal' | 'school-web' | 'editorial' | 'commercial';
 
@@ -14,11 +15,15 @@ export const LICENSES: Record<LicenseUse, { label: string; who: string; priceCen
   commercial: { label: 'Commercial', who: 'Businesses and sponsors', priceCents: 7500, terms: 'Ads and marketing. Needs the family’s release for any athlete shown.' },
 };
 
-/** Who gets what from a sale. Default: 75% photographer, 20% team fund, 5% processing. */
-export function split(priceCents: number, pct = { creator: 75, school: 20 }) {
-  const creator = Math.round((priceCents * pct.creator) / 100);
-  const school = Math.round((priceCents * pct.school) / 100);
-  return { creator, school, fees: priceCents - creator - school };
+/** Card processing on a sale: Stripe's standard US card rate, 2.9% plus 30 cents. */
+export const processing = (priceCents: number) => Math.round(priceCents * 0.029) + 30;
+
+/** Who gets what from a sale: card fees first, then 79% of the rest to the photographer and 21% to the team fund. */
+export function split(priceCents: number, creatorPct = 79) {
+  const fees = processing(priceCents);
+  const net = priceCents - fees;
+  const creator = Math.round((net * creatorPct) / 100);
+  return { creator, school: net - creator, fees };
 }
 
 /** Commercial use of a minor's image needs the family's release on file. */

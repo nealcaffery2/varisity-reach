@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Info, LinkSimple, Check } from '@phosphor-icons/react';
 import { athletes, athleteBySlug, fullName } from '@/content/athletes';
-import { benchmarks, benchmarkById } from '@/content/benchmarks';
+import { benchmarks, benchmarkById, type Benchmark } from '@/content/benchmarks';
 import { sportBySlug } from '@/content/sports';
 import { schoolBySlug } from '@/content/schools';
 import { compareRows, sideFromAthlete, tally, type CompareSide } from '@/lib/compare';
@@ -13,11 +13,13 @@ import { compareRows, sideFromAthlete, tally, type CompareSide } from '@/lib/com
 const DEFAULT_A = 'deshawn-pruitt';
 
 /** Right-hand choice: a reference recruit ("b:id") or another athlete ("a:slug"). */
-function sideFor(choice: string): { side: CompareSide; sample: boolean; source?: { label: string; url: string } } | null {
+type Other = { side: CompareSide; sample: boolean; ref?: Benchmark };
+
+function sideFor(choice: string): Other | null {
   const [kind, id] = choice.split(':');
   if (kind === 'b') {
     const b = benchmarkById(id);
-    return b ? { side: b, sample: b.sample, source: b.source } : null;
+    return b ? { side: b, sample: b.sample, ref: b } : null;
   }
   const a = athleteBySlug(id);
   return a ? { side: sideFromAthlete(a), sample: a.sample } : null;
@@ -49,7 +51,7 @@ export function CompareTool() {
   const score = tally(rows);
   const school = schoolBySlug(athlete.school);
   const choices = [
-    ...benchmarks.filter((b) => b.sport === sport.slug).map((b) => ({ value: `b:${b.id}`, label: b.label })),
+    ...benchmarks.filter((b) => b.sport === sport.slug).map((b) => ({ value: `b:${b.id}`, label: `${b.level}: ${b.label}, ${b.college}` })),
     ...athletes.filter((x) => x.slug !== athlete.slug && x.sports.includes(sport.slug)).map((x) => ({ value: `a:${x.slug}`, label: `${fullName(x)}, ${schoolBySlug(x.school)?.town}` })),
   ];
 
@@ -108,8 +110,12 @@ export function CompareTool() {
               <span className="text-bone">{score.b}</span>
             </p>
             <div className="text-right">
-              <p className="display text-3xl text-bone sm:text-4xl md:text-6xl">{other.side.label.replace(/^Sample /, '')}</p>
-              {other.sample && <p className="mt-1 text-sm text-dim">Sample reference</p>}
+              <p className="display text-3xl text-bone sm:text-4xl md:text-6xl">{other.side.label}</p>
+              {other.ref ? (
+                <p className="mt-1 text-sm text-mute">{other.ref.level} · {other.ref.school} · signed with {other.ref.college}</p>
+              ) : (
+                other.sample && <p className="mt-1 text-sm text-dim">Sample athlete</p>
+              )}
             </div>
           </div>
           <table className="mt-2 w-full">
@@ -150,11 +156,18 @@ export function CompareTool() {
           </div>
           <p className="mt-6 flex max-w-2xl gap-2 text-sm text-dim">
             <Info size={16} className="mt-0.5 shrink-0" />
-            {other.source ? (
-              <span>Reference numbers from <a href={other.source.url} className="link-u text-mute">{other.source.label}</a>.</span>
-            ) : (
-              <span>Reference recruits are sample numbers that sketch a typical prospect at the position, not a real player. Stats are season totals; small schools often play fewer games, which this table does not adjust for.</span>
-            )}
+            <span>
+              {other.ref ? (
+                <>
+                  {other.ref.label}: Class of 2025, high school senior season{other.ref.note ? `. ${other.ref.note}` : ''}. Sources:{' '}
+                  {other.ref.sources.map((src, i) => (
+                    <span key={src.url}>{i > 0 && ', '}<a href={src.url} target="_blank" rel="noreferrer" className="link-u text-mute hover:text-bone">{src.label}</a></span>
+                  ))}
+                  .{' '}
+                </>
+              ) : null}
+              Stats are season totals; small schools often play fewer games, which this table does not adjust for.
+            </span>
           </p>
         </>
       ) : (

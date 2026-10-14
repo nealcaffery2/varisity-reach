@@ -6,7 +6,7 @@ export function PageHeader({ title, accent, children }: { title: string; accent?
       <div className="wrap">
         <h1 className="display text-[clamp(3.5rem,11vw,9rem)]">
           {title}
-          {accent && <span className="text-orange"> {accent}</span>}
+          {accent && <span className="text-accent"> {accent}</span>}
         </h1>
         {children && <div className="mt-6 max-w-2xl text-lg text-mute">{children}</div>}
       </div>

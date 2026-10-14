@@ -7,7 +7,7 @@ export function Ticker({ items }: { items: string[] }) {
       {items.map((t, i) => (
         <li key={i} className="flex items-center gap-6 pr-6">
           <span className="display text-2xl text-bone md:text-3xl">{t}</span>
-          <Lightning size={18} weight="fill" className="text-orange" aria-hidden />
+          <Lightning size={18} weight="fill" className="text-accent" aria-hidden />
         </li>
       ))}
     </ul>

@@ -1,4 +1,4 @@
-# Hiltoppers design system
+# Varsity Reach design system
 
 This file is the authority for how the site looks and moves. It wins any
 conflict with a skill's defaults. Tokens live in `app/globals.css` (`@theme`);
@@ -6,9 +6,11 @@ if this file and the tokens disagree, the tokens win and this file gets fixed.
 
 ## The world
 
-Friday night under the lights in Hillsboro. A dark field, white chalk type,
-one hot orange. Every page should feel like the scoreboard, the program and the
-film room, not a school district template.
+Friday night under the lights in a small town. A dark field, white chalk
+type, one hot accent. Every page should feel like the scoreboard, the program
+and the film room, not a school district template. The accent belongs to
+whoever owns the page: Varsity Reach signal orange on network pages, the
+school's color on its own pages and on its athletes' profiles.
 
 ## Color
 
@@ -21,10 +23,16 @@ film room, not a school district template.
 | `bone` | `#f3f1ee` | Primary text; the one light section (reels on home). |
 | `mute` | `#a6a6ad` | Secondary text (8:1 on ink). |
 | `dim` | `#8a8a92` | Tertiary text (5.3:1 on ink-2). Never lighter. |
-| `orange` | `#ff7f00` | Topper orange, sampled from the H logo. The only accent. |
-| `orange-2` | `#ff9a33` | Hover and orange text over video. |
-| `orange-ink` | `#1a0d00` | Text on orange buttons. |
-| `orange-deep` | `#b45200` | Orange text on bone (4.6:1). |
+| `accent` | `#ff5b1f` | Varsity Reach orange. Schools override all four accent tokens (`schoolTheme()` in `content/schools.ts`); Hillsboro's is `#ff7f00`, sampled from the H logo. |
+| `accent-2` | `#ff7d4d` | Hover, and accent text over video. |
+| `accent-ink` | `#1f0800` | Text on accent buttons. |
+| `accent-deep` | `#b23a0b` | Accent text on bone. |
+| `danger` | `#ff8a7a` | Errors and invalid states. |
+| `ok` | `#7bd88f` | A valid gold card. |
+
+A school accent must reach 4.5:1 against `ink` and its `accent-ink` must
+reach 4.5:1 on the accent. Lighten dark school colors (maroon becomes
+`#e8546a`, navy schools lead with their gold).
 
 Rules: one accent, used for the primary action, the active state, the lead
 number in a stat block, and the second word of a headline. No gradients on
@@ -36,7 +44,7 @@ text, no glows. Footage is graded grayscale with an orange multiply layer
 - Display: **Big Shoulders** 900, uppercase, `line-height: 0.86`, class
   `.display`. Headlines, team names, athlete names, big dates. Chicago-drawn
   condensed grotesque; reads like stadium lettering.
-- Body: **Barlow** 400 to 700. Labels, paragraphs, buttons.
+- Body: **Barlow** 400 to 700. Labels, paragraphs, buttons. (Geist was flagged as overused by the detector and replaced.)
 - Numbers: **Geist Mono** with tabular figures, class `.num`. Every stat,
   height, weight, GPA and time, so columns line up.
 - Scale: display runs from `text-3xl` (sidebars) to `clamp(4rem, 17vw, 15rem)`
@@ -76,7 +84,13 @@ One authored moment per page, then quiet.
 | Athlete card | `components/athlete-card.tsx` | Jersey number is the portrait. |
 | Recruit board | `components/recruit-board.tsx` | Filters in the URL, card and table views, phone sheet. |
 | Share bar | `components/share-bar.tsx` | Native share, copy, X, Facebook, email, QR, print. |
-| Reel feed | `components/reel-feed.tsx` | Full-screen vertical snap, double-tap like. |
+| Reel feed | `components/reel-feed.tsx` | Full-screen vertical snap, double-tap like, school filter. |
+| Score bar | `components/game/scorebug.tsx` | Broadcast-style; the same component is the OBS overlay. |
+| Game center | `components/game/game-center.tsx` | Community score, agreement meter, report sheet, streams. |
+| Compare | `components/compare-tool.tsx` | Mirrored bars, accent marks the edge. |
+| Campaign | `components/fundraise/campaign-view.tsx` | Milestone track, squad race, backer tiers. |
+| Gold card | `components/fundraise/gold-card.tsx` | The one place gold appears. |
+| Roster import | `components/coach/roster-import.tsx` | Drop zone, skeleton while reading, diff table. |
 
 ## Copy
 

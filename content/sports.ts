@@ -90,5 +90,24 @@ export const sports: Sport[] = [
 
 export const SEASONS: Season[] = ['Fall', 'Winter', 'Spring'];
 
+/** Every sport the platform knows, for names and stat columns. Hillsboro's list doubles as the catalog. */
 export const sportBySlug = (slug: string) => sports.find((x) => x.slug === slug);
-export const sportsBySeason = (season: Season) => sports.filter((x) => x.season === season);
+
+// Sample schools run fewer programs. Their pages show the team with no staff
+// until a coach claims it from the coach dashboard.
+const SAMPLE_TEAMS: Record<string, string[]> = {
+  'prairie-bend': ['football', 'volleyball', 'boys-basketball', 'girls-basketball', 'wrestling', 'track-and-field', 'baseball', 'softball'],
+  'cedar-fork': ['football', 'volleyball', 'boys-basketball', 'girls-basketball', 'track-and-field', 'baseball', 'softball', 'boys-tennis', 'girls-tennis'],
+  'kessler-valley': ['football', 'volleyball', 'boys-basketball', 'girls-basketball', 'wrestling', 'track-and-field', 'baseball', 'softball', 'boys-golf'],
+  'elm-hollow': ['football', 'volleyball', 'boys-soccer', 'boys-basketball', 'girls-basketball', 'wrestling', 'track-and-field', 'baseball', 'softball'],
+};
+
+export function sportsFor(school: string): Sport[] {
+  if (school === 'hillsboro') return sports;
+  return (SAMPLE_TEAMS[school] ?? []).flatMap((slug) => {
+    const s = sportBySlug(slug);
+    return s ? [{ ...s, coaches: [], scheduleUrl: undefined, blurb: 'Sample team. The head coach claims it from the coach dashboard and uploads the roster.' }] : [];
+  });
+}
+
+export const sportsBySeason = (season: Season, school = 'hillsboro') => sportsFor(school).filter((x) => x.season === season);

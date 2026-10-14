@@ -4,13 +4,24 @@ import Link from 'next/link';
 import { useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, Play } from '@phosphor-icons/react';
-import { site } from '@/content/site';
 import { asset } from '@/lib/asset';
 
-const WORD = site.mascot.toUpperCase();
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export function Hero() {
+type HeroProps = {
+  /** Small line above the big word, e.g. the town. */
+  over: string;
+  /** The big word that rises in letter by letter. */
+  word: string;
+  label: string;
+  sub: string;
+  reel: { src: string; poster: string };
+  primary: { href: string; label: string };
+  secondary: { href: string; label: string };
+};
+
+export function Hero({ over, word, label, sub, reel, primary, secondary }: HeroProps) {
+  const WORD = word.toUpperCase();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
@@ -19,12 +30,12 @@ export function Hero() {
   const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section ref={ref} className="relative isolate h-[100svh] min-h-[600px] overflow-hidden" aria-label={`${site.school} athletics`}>
+    <section ref={ref} className="relative isolate h-[100svh] min-h-[600px] overflow-hidden" aria-label={label}>
       <motion.div style={{ scale }} className="absolute inset-0 -z-10 origin-center">
         <video
           className="h-full w-full object-cover grayscale contrast-125 brightness-75"
-          src={asset('/media/reels/r1.mp4')}
-          poster={asset('/media/reels/r1.jpg')}
+          src={asset(reel.src)}
+          poster={asset(reel.poster)}
           autoPlay={!reduce}
           muted
           loop
@@ -33,22 +44,22 @@ export function Hero() {
           aria-hidden
         />
         {/* Orange duotone: multiply lifts the brand into the highlights without a glow. */}
-        <div className="absolute inset-0 bg-orange mix-blend-multiply opacity-60" />
+        <div className="absolute inset-0 bg-accent mix-blend-multiply opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-transparent to-transparent" />
       </motion.div>
       <div className="grain absolute inset-0 -z-10 overflow-hidden" />
 
       <motion.div style={{ y: lift, opacity: fade }} className="wrap flex h-full flex-col justify-end pb-24 md:pb-28">
-        <h1 className="display text-bone text-[clamp(4.25rem,17vw,15rem)] leading-[0.8]" aria-label={`Hillsboro ${site.mascot}`}>
-          <span className="block overflow-hidden text-[0.28em] leading-none tracking-normal text-orange">
+        <h1 className="display text-bone text-[clamp(4.25rem,17vw,15rem)] leading-[0.8]" aria-label={`${over} ${word}`}>
+          <span className="block overflow-hidden text-[0.28em] leading-none tracking-normal text-accent">
             <motion.span
               className="block pb-[0.08em]"
               initial={reduce ? false : { y: '110%' }}
               animate={{ y: 0 }}
               transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
             >
-              Hillsboro
+              {over}
             </motion.span>
           </span>
           <span className="flex overflow-hidden" aria-hidden>
@@ -72,13 +83,13 @@ export function Hero() {
           transition={{ duration: 0.8, ease: EASE, delay: 0.75 }}
         >
           <p className="max-w-md text-lg leading-snug text-bone/85 md:text-xl">
-            Scores, film and recruiting profiles for every Topper at {site.school}.
+            {sub}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/reels/" className="btn btn-primary">
-              <Play size={18} weight="fill" /> Watch reels
+            <Link href={primary.href} className="btn btn-primary">
+              <Play size={18} weight="fill" /> {primary.label}
             </Link>
-            <Link href="/athletes/" className="btn btn-ghost bg-ink/40 backdrop-blur-sm">Recruit board</Link>
+            <Link href={secondary.href} className="btn btn-ghost bg-ink/40 backdrop-blur-sm">{secondary.label}</Link>
           </div>
         </motion.div>
       </motion.div>

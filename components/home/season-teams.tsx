@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'motion/react';
 import { ArrowUpRight } from '@phosphor-icons/react';
-import { SEASONS, sports } from '@/content/sports';
-import type { Season } from '@/lib/types';
+import { SEASONS } from '@/content/sports';
+import type { Season, Sport } from '@/lib/types';
 import { asset } from '@/lib/asset';
 
 /** Current IHSA season for the default tab. */
@@ -16,7 +16,9 @@ function seasonFor(d = new Date()): Season {
   return 'Spring';
 }
 
-export function SeasonTeams() {
+const WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen'];
+
+export function SeasonTeams({ school, list: all }: { school: string; list: Sport[] }) {
   const [season, setSeason] = useState<Season>(seasonFor);
   const [hover, setHover] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -24,14 +26,14 @@ export function SeasonTeams() {
   const my = useMotionValue(0);
   const x = useSpring(mx, { stiffness: 260, damping: 28, mass: 0.6 });
   const y = useSpring(my, { stiffness: 260, damping: 28, mass: 0.6 });
-  const list = sports.filter((s) => s.season === season);
+  const list = all.filter((s) => s.season === season);
   const preview = list.find((s) => s.slug === hover)?.reel;
 
   return (
     <section className="py-24 md:py-32" aria-labelledby="teams-h">
       <div className="wrap">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <h2 id="teams-h" className="display text-5xl sm:text-6xl md:text-8xl">Fifteen teams.<br /><span className="text-orange">Three seasons.</span></h2>
+          <h2 id="teams-h" className="display text-5xl sm:text-6xl md:text-8xl">{WORDS[all.length] ?? all.length} teams.<br /><span className="text-accent">Three seasons.</span></h2>
           <div role="tablist" aria-label="Season" className="flex gap-1 rounded-full border border-line p-1 self-start md:self-auto">
             {SEASONS.map((s) => (
               <button
@@ -40,9 +42,9 @@ export function SeasonTeams() {
                 type="button"
                 aria-selected={season === s}
                 onClick={() => setSeason(s)}
-                className={`relative h-10 rounded-full px-5 text-sm font-medium transition-colors ${season === s ? 'text-orange-ink' : 'text-mute hover:text-bone'}`}
+                className={`relative h-10 rounded-full px-5 text-sm font-medium transition-colors ${season === s ? 'text-accent-ink' : 'text-mute hover:text-bone'}`}
               >
-                {season === s && <motion.span layoutId="season-pill" className="absolute inset-0 rounded-full bg-orange" transition={{ type: 'spring', stiffness: 400, damping: 34 }} />}
+                {season === s && <motion.span layoutId="season-pill" className="absolute inset-0 rounded-full bg-accent" transition={{ type: 'spring', stiffness: 400, damping: 34 }} />}
                 <span className="relative">{s}</span>
               </button>
             ))}
@@ -74,19 +76,19 @@ export function SeasonTeams() {
               {list.map((s) => (
                 <li key={s.slug} className="border-b border-line">
                   <Link
-                    href={`/sports/${s.slug}/`}
+                    href={`/${school}/teams/${s.slug}/`}
                     onPointerEnter={(e) => e.pointerType === 'mouse' && setHover(s.slug)}
                     onFocus={() => setHover(null)}
                     className="group grid grid-cols-[1fr_auto] items-center gap-4 py-5 md:grid-cols-[1fr_16rem_auto] md:py-6"
                   >
-                    <span className="display text-5xl text-bone transition-[color,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-3 group-hover:text-orange md:text-7xl">
+                    <span className="display text-5xl text-bone transition-[color,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-3 group-hover:text-accent md:text-7xl">
                       {s.name}
                     </span>
                     <span className="hidden text-sm text-mute md:block">
-                      {s.coaches[0]}
+                      {s.coaches[0] ?? <span className="text-dim">Staff not posted</span>}
                       {s.coaches.length > 1 && <span className="text-dim"> + {s.coaches.length - 1} coaches</span>}
                     </span>
-                    <ArrowUpRight size={28} className="text-dim transition-[color,transform] duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-orange" />
+                    <ArrowUpRight size={28} className="text-dim transition-[color,transform] duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-accent" />
                   </Link>
                 </li>
               ))}

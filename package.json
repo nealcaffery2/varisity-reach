@@ -1,5 +1,5 @@
 {
-  "name": "hiltoppers",
+  "name": "varsity-reach",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,16 +10,20 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:copy": "tsx tools/check-copy.ts",
-    "test": "tsx tools/no-ai-slop.test.ts && tsx tools/filters.test.ts"
+    "test": "tsx tools/no-ai-slop.test.ts && tsx tools/filters.test.ts && tsx tools/consensus.test.ts && tsx tools/streams.test.ts && tsx tools/fundraise.test.ts && tsx tools/compare.test.ts && tsx tools/roster.test.ts && tsx tools/sync-functions.ts --check",
+    "sync:functions": "tsx tools/sync-functions.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "@supabase/supabase-js": "^2.117.3",
     "lenis": "^1.3.26",
+    "mammoth": "^1.13.0",
     "motion": "^14.2.0",
     "next": "16.4.0",
     "qrcode": "^1.5.4",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

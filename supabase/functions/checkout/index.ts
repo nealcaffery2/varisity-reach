@@ -1,0 +1,53 @@
+// Opens Stripe Checkout for a gift or a gold card. Money is a destination
+// charge to the school's (or booster club's) connected account, so funds land
+// with them; the platform keeps PLATFORM_FEE_PCT (0 by default).
+import { admin, fail, json, serve } from '../_shared/http.ts';
+import { stripe } from '../_shared/stripe.ts';
+
+const FEE_PCT = Number(Deno.env.get('PLATFORM_FEE_PCT') ?? '0');
+const GOLD_PRICE_CENTS = Number(Deno.env.get('GOLD_CARD_PRICE_CENTS') ?? '2000');
+
+serve(async (req) => {
+  const b = await req.json().catch(() => null);
+  const returnUrl = String(b?.returnUrl ?? '');
+  const origin = Deno.env.get('SITE_ORIGIN');
+  if (origin && !returnUrl.startsWith(origin)) return fail('Unknown return address.');
+  const db = admin();
+
+  if (b?.kind === 'donation') {
+    const cents = Math.round(Number(b.amountCents));
+    if (!Number.isInteger(cents) || cents < 500 || cents > 1_000_000) return fail('Gifts run from $5 to $10,000.');
+    const { data: c } = await db.from('campaigns').select('id, title, status, school_slug, schools(stripe_account, payee_name)').eq('id', String(b.campaignId)).maybeSingle();
+    if (!c) return fail('That fundraiser is a sample or no longer open.', 404);
+    // deno-lint-ignore no-explicit-any
+    const school = (c as any).schools as { stripe_account: string | null; payee_name: string | null };
+    if (c.status !== 'live' || !school?.stripe_account) return fail('This fundraiser is not taking gifts yet.', 409);
+    const session = await stripe<{ url: string }>('/checkout/sessions', {
+      mode: 'payment',
+      success_url: `${returnUrl}?thanks=1`,
+      cancel_url: returnUrl,
+      submit_type: 'donate',
+      line_items: { 0: { quantity: 1, price_data: { currency: 'usd', unit_amount: cents, product_data: { name: c.title, description: `Paid to ${school.payee_name ?? 'the school'}` } } } },
+      payment_intent_data: { transfer_data: { destination: school.stripe_account }, application_fee_amount: Math.round((cents * FEE_PCT) / 100) || undefined },
+      metadata: { kind: 'donation', campaign_id: c.id, name: String(b.name ?? '').slice(0, 80), anonymous: b.anonymous ? '1' : '0', message: String(b.message ?? '').slice(0, 120), squad: String(b.squad ?? '').slice(0, 40) },
+    });
+    return json({ url: session.url });
+  }
+
+  if (b?.kind === 'gold-card') {
+    const { data: s } = await db.from('schools').select('slug, name, stripe_account, payee_name').eq('slug', String(b.school)).maybeSingle();
+    if (!s?.stripe_account) return fail('Gold cards are not on sale for that school yet.', 409);
+    const session = await stripe<{ url: string }>('/checkout/sessions', {
+      mode: 'payment',
+      success_url: `${returnUrl}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: returnUrl,
+      customer_email: String(b.email ?? ''),
+      line_items: { 0: { quantity: 1, price_data: { currency: 'usd', unit_amount: GOLD_PRICE_CENTS, product_data: { name: `${s.name} gold card` } } } },
+      payment_intent_data: { transfer_data: { destination: s.stripe_account }, application_fee_amount: Math.round((GOLD_PRICE_CENTS * FEE_PCT) / 100) || undefined },
+      metadata: { kind: 'gold-card', school: s.slug, holder: String(b.holder ?? '').slice(0, 60), email: String(b.email ?? '').slice(0, 120) },
+    });
+    return json({ url: session.url });
+  }
+
+  return fail('Unknown checkout.');
+});

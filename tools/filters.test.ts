@@ -2,6 +2,7 @@
 // survives a trip through the URL. Run: npx tsx tools/filters.test.ts
 import assert from 'node:assert/strict';
 import { athletes } from '../content/athletes';
+import { schoolBySlug } from '../content/schools';
 import { EMPTY, activeCount, applyFilters, parseFilters, serializeFilters, type Filters } from '../lib/filters';
 import { formatStat, feetInches } from '../lib/format';
 
@@ -44,6 +45,17 @@ test('URL round trip keeps the search, drops defaults', () => {
   assert.deepEqual(back, { ...want, grad: [2027, 2028] });
   assert.equal(serializeFilters(EMPTY), '');
   assert.equal(activeCount(want), 5);
+});
+
+test('school, state, class and verified narrow', () => {
+  assert.ok(applyFilters(athletes, f({ school: 'cedar-fork' })).every((a) => a.school === 'cedar-fork'));
+  const tx = applyFilters(athletes, f({ state: 'TX' }), schoolBySlug);
+  assert.ok(tx.length > 0 && tx.every((a) => schoolBySlug(a.school)?.state === 'TX'));
+  const small = applyFilters(athletes, f({ classes: ['1A', '2A'] }), schoolBySlug);
+  assert.ok(small.length > 0 && small.every((a) => ['1A', '2A'].includes(schoolBySlug(a.school)!.classification)));
+  assert.ok(applyFilters(athletes, f({ verified: true })).every((a) => a.verified));
+  const back = parseFilters(new URLSearchParams(serializeFilters(f({ state: 'ia', classes: ['2A', '1A'], verified: true }))));
+  assert.deepEqual([back.state, back.classes, back.verified], ['IA', ['1A', '2A'], true]);
 });
 
 test('junk in the URL falls back to defaults', () => {

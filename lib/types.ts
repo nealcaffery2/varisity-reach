@@ -35,8 +35,37 @@ export type SeasonLine = {
   stats: Record<string, number>;
 };
 
+export type Classification = '1A' | '2A' | '3A' | '4A' | '5A' | '6A';
+
+export type School = {
+  slug: string;
+  name: string; // "Hillsboro High School"
+  town: string;
+  state: string; // two-letter
+  mascot: string; // "Hiltoppers"
+  short: string; // "Toppers"
+  classification: Classification;
+  /** How the state association counts classes, e.g. "IHSA 3A football". */
+  classNote?: string;
+  conference: string;
+  /** Invented school shipped to show the platform. Shows a tag and stays out of search. */
+  sample: boolean;
+  colors: { accent: string; accent2: string; accentInk: string; accentDeep: string; name: string };
+  logo?: string;
+  heroReel: string;
+  rallyCry: string;
+  address?: { street: string; city: string; state: string; zip: string };
+  phone?: string;
+  athleticDirector?: string;
+  recruitingEmail?: string;
+  links: Partial<Record<'district' | 'athletics' | 'schedules' | 'calendar' | 'coaches' | 'facebook' | 'instagram', string>>;
+  /** Enrollment, so a recruiter sees how small the pond is. */
+  enrollment?: number;
+};
+
 export type Athlete = {
   slug: string;
+  school: string; // school slug
   first: string;
   last: string;
   /** Sample data shipped with the template. Shows a visible tag and keeps the profile out of search. */
@@ -61,6 +90,8 @@ export type Athlete = {
   bio: string;
   reels: string[]; // reel ids
   coach: string; // name of the coach who vouches
+  /** Numbers signed off by a verified coach or reporter on the platform. */
+  verified?: { by: string; role: 'coach' | 'reporter'; on: string };
   hometown: string;
   socials?: { x?: string; instagram?: string; hudl?: string };
 };
@@ -79,6 +110,7 @@ export type Reel = {
 
 export type NewsItem = {
   slug: string;
+  school: string;
   title: string;
   date?: string; // ISO; undated archive items leave it out
   sport?: string;
@@ -89,6 +121,7 @@ export type NewsItem = {
 };
 
 export type EventItem = {
+  school: string;
   date: string; // ISO
   end?: string;
   title: string;

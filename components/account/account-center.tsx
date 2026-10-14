@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Bell, Check, X } from '@phosphor-icons/react';
 import { athleteBySlug, fullName } from '@/content/athletes';
+import { grants } from '@/content/grants';
+import { schoolBySlug, schools } from '@/content/schools';
+import { upcoming } from '@/lib/grants';
 import {
-  answerFilm, answerMeet, demoFilm, demoLinks, demoMeets, demoNotices, demoPrefs, myStars, NOTICE_KINDS, savePrefs, setDemoViewer, viewer,
+  answerFilm, answerMeet, demoFilm, demoLinks, demoMeets, demoNotices, getPrefs, myStars, NOTICE_KINDS, savePrefs, setDemoViewer, viewer,
   type FilmRequest, type MeetRequest, type Notice, type Prefs, type Viewer,
 } from '@/lib/community';
 
@@ -44,7 +47,7 @@ export function AccountCenter() {
     setNotices([...watched].flatMap((a) => demoNotices(a).map((n) => ({ ...n, athlete: a }))).sort((a, b) => b.at.localeCompare(a.at)));
     setMeets(demoMeets());
     setFilm(demoFilm());
-    setPrefs(demoPrefs());
+    getPrefs().then(setPrefs);
     setStars(myStars());
   };
   useEffect(() => {
@@ -54,6 +57,12 @@ export function AccountCenter() {
   }, []);
 
   if (!v) return <div className="h-40 animate-pulse rounded bg-ink-2" aria-hidden />;
+
+  // Grant deadlines for the viewer's school (demo: the first real school), when alerts are on.
+  const home = schoolBySlug(v.school ?? '') ?? schools.find((s) => !s.sample);
+  const d = new Date();
+  const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const deadlines = home && !prefs.muted.includes('grant_deadline') ? upcoming(grants, { state: home.state, county: home.county }, today, 60) : [];
 
   const updatePrefs = async (p: Prefs) => {
     setPrefs(p);
@@ -79,7 +88,7 @@ export function AccountCenter() {
         <section aria-labelledby="notes-h">
           <h2 id="notes-h" className="display flex items-center gap-3 text-4xl"><Bell size={28} className="text-accent" aria-hidden /> Notifications</h2>
           {notices.length === 0 ? (
-            <p className="mt-4 text-mute">Nothing yet. When a recruiter stars, writes to or asks to meet an athlete you are linked to, it shows up here and by email.</p>
+            <p className="mt-4 text-mute">Nothing yet. When a recruiter stars, writes to or asks to meet an athlete you are linked to, it shows up here.</p>
           ) : (
             <ul className="mt-4 divide-y divide-line border-y border-line">
               {notices.map((n, i) => {
@@ -94,6 +103,21 @@ export function AccountCenter() {
             </ul>
           )}
         </section>
+
+        {deadlines.length > 0 && home && (
+          <section aria-labelledby="grants-h">
+            <h2 id="grants-h" className="display text-4xl">Grant deadlines</h2>
+            <p className="mt-2 text-sm text-mute">For {home.name}, {home.county ? `${home.county} County, ` : ''}{home.state}. Turn these off under Tell me when.</p>
+            <ul className="mt-4 divide-y divide-line border-y border-line text-sm">
+              {deadlines.map((g) => (
+                <li key={g.id} className="flex flex-wrap items-baseline justify-between gap-2 py-3">
+                  <a className="link-u text-bone" href={g.url} target="_blank" rel="noreferrer">{g.org}: {g.name}</a>
+                  <span className="text-dim">{g.cycle}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section aria-labelledby="meet-h">
           <h2 id="meet-h" className="display text-4xl">Meet and greet</h2>

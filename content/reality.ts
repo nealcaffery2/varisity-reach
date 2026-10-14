@@ -20,7 +20,7 @@ export const reality: Fact[] = [
   },
   {
     figure: '53.9%',
-    claim: 'of the class of 2025 had filed the FAFSA by June 30. Filing makes a senior 84% more likely to enroll in college right away.',
+    claim: 'of the class of 2025 had filed the FAFSA by June 30. Seniors who file are 84% more likely to enroll in college right away.',
     year: '2025',
     source: 'National College Attainment Network',
     url: 'https://www.ncan.org/Web/Web/FAFSA/Why-FAFSA.aspx',
@@ -62,7 +62,7 @@ export const reality: Fact[] = [
   },
   {
     figure: '10 years',
-    claim: 'is the age past which certified reconditioners will not recertify a football helmet. Then it has to be replaced.',
+    claim: 'old or older, a football helmet can no longer be recertified by certified reconditioners. It has to be replaced.',
     year: 'since 2012',
     source: 'National Athletic Equipment Reconditioners Association',
     url: 'https://www.naera.net/10-years-or-older-helmets',

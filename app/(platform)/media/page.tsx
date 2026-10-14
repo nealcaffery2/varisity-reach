@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/page-header';
-import { CoverageBoard, CreatorSignup, LicenseTable } from '@/components/media/marketplace';
+import { CoverageBoard, CreatorSignup, LicenseTable, PhotoGallery, PhotoUpload } from '@/components/media/marketplace';
 
 export const metadata: Metadata = { title: 'Photo and video', description: 'Coaches request game coverage, local photographers and videographers take it, and schools and newspapers license the shots with credit.' };
 
@@ -19,11 +19,19 @@ export default function MediaPage() {
           <div className="mt-8"><LicenseTable /></div>
         </div>
       </section>
+      <section className="border-t border-line py-14" aria-labelledby="gal-h">
+        <div className="wrap">
+          <h2 id="gal-h" className="display text-5xl md:text-7xl">For <span className="text-accent">sale</span></h2>
+          <div className="mt-8"><PhotoGallery /></div>
+        </div>
+      </section>
       <section className="border-t border-line py-14" aria-labelledby="join-h">
         <div className="wrap max-w-4xl">
           <h2 id="join-h" className="display text-5xl md:text-7xl">Shoot <span className="text-accent">for us</span></h2>
           <p className="mt-4 max-w-[34rem] text-mute">Students with a phone and a good eye count too. Payouts go through Stripe.</p>
           <div className="mt-8"><CreatorSignup /></div>
+          <h3 className="display mt-12 text-3xl">Upload your shots</h3>
+          <div className="mt-4"><PhotoUpload /></div>
         </div>
       </section>
     </>

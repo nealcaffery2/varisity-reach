@@ -12,7 +12,7 @@ export const LICENSES: Record<LicenseUse, { label: string; who: string; priceCen
   personal: { label: 'Personal', who: 'Families', priceCents: 500, terms: 'Print and share. No resale, no ads.' },
   'school-web': { label: 'School', who: 'The school or district', priceCents: 1500, terms: 'School website, social posts, yearbook, programs.' },
   editorial: { label: 'Editorial', who: 'Newspapers, radio and TV sites', priceCents: 2500, terms: 'News stories in print and online, with credit.' },
-  commercial: { label: 'Commercial', who: 'Businesses and sponsors', priceCents: 7500, terms: 'Ads and marketing. Needs the family’s release for any athlete shown.' },
+  commercial: { label: 'Commercial', who: 'Businesses and sponsors', priceCents: 7500, terms: 'Ads and marketing. Needs the family’s release for any student in the photo.' },
 };
 
 /** Card processing on a sale: Stripe's standard US card rate, 2.9% plus 30 cents. */
@@ -26,7 +26,7 @@ export function split(priceCents: number, creatorPct = 79) {
   return { creator, school: net - creator, fees };
 }
 
-/** Commercial use of a minor's image needs the family's release on file. */
+/** Commercial use of a photo with students in it needs the family's release on file. */
 export function canLicense(use: LicenseUse, photo: { minorsShown: boolean; releaseOnFile: boolean }): { ok: true } | { ok: false; reason: string } {
   if (use === 'commercial' && photo.minorsShown && !photo.releaseOnFile) return { ok: false, reason: 'Commercial use of a photo with students in it needs the family’s release first.' };
   return { ok: true };
@@ -40,15 +40,16 @@ export const creditLine = (creator: string, school: string) => `Photo: ${creator
 export type Listing = { gameId: string; kickoff: string; sponsor?: { name: string; cents: number; pledge: string } };
 
 /**
- * Watch list order: games live now first, then sponsored games by amount,
- * then everything else by kickoff. A sponsor buys the top of its group,
- * never a spot above a live game.
+ * Watch list order: games live now first, by kickoff; then sponsored games by
+ * amount; then everything else by kickoff. Money never moves a game within
+ * or above the live group.
  */
 export function orderListings<T extends Listing>(list: readonly T[], live: ReadonlySet<string>): T[] {
   return [...list].sort((a, b) => {
     const la = live.has(a.gameId) ? 1 : 0;
     const lb = live.has(b.gameId) ? 1 : 0;
     if (la !== lb) return lb - la;
+    if (la) return a.kickoff.localeCompare(b.kickoff);
     const sa = a.sponsor?.cents ?? 0;
     const sb = b.sponsor?.cents ?? 0;
     if (sa !== sb) return sb - sa;

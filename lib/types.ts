@@ -61,6 +61,10 @@ export type School = {
   links: Partial<Record<'district' | 'athletics' | 'schedules' | 'calendar' | 'coaches' | 'facebook' | 'instagram', string>>;
   /** Enrollment, so a recruiter sees how small the pond is. */
   enrollment?: number;
+  /** IHSA school id, for Illinois members (ihsa.org directory). */
+  ihsaId?: string;
+  /** County, for matching local grants. */
+  county?: string;
 };
 
 export type Athlete = {

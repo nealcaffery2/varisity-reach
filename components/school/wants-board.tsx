@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowFatUp, Copy, FacebookLogo, HandCoins, XLogo, Plus } from '@phosphor-icons/react';
-import { listPledges, listWants, myWantVotes, pledgeWant, suggestWant, voteWant, type Want, type WantPledge } from '@/lib/community';
+import { listPledges, listWants, myWantVotes, pledgeWant, suggestWant, viewer, voteWant, type Want, type WantPledge } from '@/lib/community';
 import { pledgeProgress } from '@/lib/media';
 
 type Props = { school: string; town: string; short: string; sports: { slug: string; name: string }[]; starters: Want[] };
@@ -17,7 +17,10 @@ export function WantsBoard({ school, town, short, sports, starters }: Props) {
   const [copied, setCopied] = useState('');
   const [pledges, setPledges] = useState<WantPledge[]>([]);
   const [pledging, setPledging] = useState('');
-  const [pf, setPf] = useState<{ by: WantPledge['by']; name: string; dollars: string; hours: string }>({ by: 'faculty', name: '', dollars: '', hours: '' });
+  const blankPledge = { by: 'family' as WantPledge['by'], name: '', dollars: '', hours: '' };
+  const [pf, setPf] = useState<{ by: WantPledge['by']; name: string; dollars: string; hours: string }>(blankPledge);
+  const [pledgeBusy, setPledgeBusy] = useState(false);
+  const [staff, setStaff] = useState(false);
 
   const load = () =>
     listWants(school, starters).then((w) => {
@@ -29,6 +32,7 @@ export function WantsBoard({ school, town, short, sports, starters }: Props) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMine(myWantVotes(school));
     load();
+    viewer().then((v) => setStaff(v.verified && ['coach', 'athletic director'].includes(v.role)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [school]);
 
@@ -98,19 +102,21 @@ export function WantsBoard({ school, town, short, sports, starters }: Props) {
                         className="mt-3 grid gap-2 rounded-sm bg-ink-2 p-3 sm:grid-cols-2"
                         onSubmit={async (e) => {
                           e.preventDefault();
+                          setPledgeBusy(true);
                           const r = await pledgeWant(school, { wantId: w.id, by: pf.by, name: pf.name, cents: pf.dollars ? Math.round(Number(pf.dollars) * 100) : undefined, hours: pf.hours ? Number(pf.hours) : undefined });
-                          setMsg(r.ok ? 'Pledge recorded. The athletic office sees who stepped up.' : r.reason);
-                          if (r.ok) { setPledging(''); load(); }
+                          setPledgeBusy(false);
+                          setMsg(r.ok ? (r.demo ? 'Pledge saved in this browser (demo mode).' : 'Pledge recorded. The athletic office sees who stepped up.') : r.reason);
+                          if (r.ok) { setPledging(''); setPf(blankPledge); load(); }
                         }}
                       >
-                        <div><label htmlFor={`pl-by-${w.id}`} className="field-label">Pledging as</label><select id={`pl-by-${w.id}`} className="field" value={pf.by} onChange={(e) => setPf({ ...pf, by: e.target.value as WantPledge['by'] })}><option value="faculty">Faculty or staff</option><option value="booster">Booster</option><option value="sponsor">Local business</option><option value="family">Family</option></select></div>
+                        <div><label htmlFor={`pl-by-${w.id}`} className="field-label">Pledging as</label><select id={`pl-by-${w.id}`} className="field" value={pf.by} onChange={(e) => setPf({ ...pf, by: e.target.value as WantPledge['by'] })}>{staff && <option value="faculty">Faculty or staff</option>}<option value="booster">Booster</option><option value="sponsor">Local business</option><option value="family">Family</option></select></div>
                         <div><label htmlFor={`pl-n-${w.id}`} className="field-label">Name</label><input id={`pl-n-${w.id}`} required className="field" value={pf.name} onChange={(e) => setPf({ ...pf, name: e.target.value })} /></div>
-                        <div><label htmlFor={`pl-d-${w.id}`} className="field-label">Dollars</label><input id={`pl-d-${w.id}`} inputMode="numeric" className="field num" value={pf.dollars} onChange={(e) => setPf({ ...pf, dollars: e.target.value.replace(/\D/g, '') })} /></div>
-                        <div><label htmlFor={`pl-h-${w.id}`} className="field-label">Volunteer hours</label><input id={`pl-h-${w.id}`} inputMode="numeric" className="field num" value={pf.hours} onChange={(e) => setPf({ ...pf, hours: e.target.value.replace(/\D/g, '') })} /></div>
-                        <div className="flex gap-2 sm:col-span-2"><button className="btn btn-primary">Pledge</button><button type="button" className="btn btn-ghost" onClick={() => setPledging('')}>Cancel</button></div>
+                        <div><label htmlFor={`pl-d-${w.id}`} className="field-label">Dollars</label><input id={`pl-d-${w.id}`} inputMode="numeric" className="field num" value={pf.dollars} onChange={(e) => setPf({ ...pf, dollars: e.target.value.replace(/\D/g, '').slice(0, 6) })} /></div>
+                        <div><label htmlFor={`pl-h-${w.id}`} className="field-label">Volunteer hours</label><input id={`pl-h-${w.id}`} inputMode="numeric" className="field num" value={pf.hours} onChange={(e) => setPf({ ...pf, hours: e.target.value.replace(/\D/g, '').slice(0, 4) })} /></div>
+                        <div className="flex gap-2 sm:col-span-2"><button className="btn btn-primary" disabled={pledgeBusy}>{pledgeBusy ? 'Saving…' : 'Pledge'}</button><button type="button" className="btn btn-ghost" onClick={() => setPledging('')}>Cancel</button></div>
                       </form>
                     ) : (
-                      <button type="button" className="link-u mt-2 inline-flex min-h-11 items-center gap-1 text-sm text-mute hover:text-bone" onClick={() => setPledging(w.id)}><HandCoins size={14} aria-hidden /> Pledge money or hours</button>
+                      <button type="button" className="link-u mt-2 inline-flex min-h-11 items-center gap-1 text-sm text-mute hover:text-bone" onClick={() => { setPledging(w.id); setPf(blankPledge); }}><HandCoins size={14} aria-hidden /> Pledge money or hours</button>
                     )}
                     <div className="mt-2 flex flex-wrap gap-x-4 text-xs text-dim">
                       <a className="link-u inline-flex min-h-8 items-center gap-1 hover:text-bone" target="_blank" rel="noreferrer" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window === 'undefined' ? '' : pageUrl())}&quote=${encodeURIComponent(shareText(w))}`}><FacebookLogo size={14} aria-hidden /> Facebook</a>

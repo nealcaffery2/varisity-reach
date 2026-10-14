@@ -27,6 +27,8 @@ export const schools: School[] = [
     recruitingEmail: 'aduff@hillsboroschools.net',
     // IHSA school directory, April 2026.
     enrollment: 427,
+    ihsaId: '0816',
+    county: 'Montgomery',
     links: {
       district: 'https://www.hillsboroschools.net',
       athletics: 'https://hhs.hillsboroschools.net/athletics',

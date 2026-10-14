@@ -35,6 +35,9 @@ test('watch list: live first, then sponsors by amount, then kickoff', () => {
     { gameId: 'd', kickoff: '2026-10-16T20:00' },
   ];
   assert.deepEqual(orderListings(list, new Set(['d'])).map((x) => x.gameId), ['d', 'c', 'b', 'a']);
+  // Two live games stay in kickoff order even when one is sponsored.
+  assert.deepEqual(orderListings(list, new Set(['a', 'c'])).map((x) => x.gameId), ['c', 'a', 'b', 'd']);
+  assert.deepEqual(orderListings([{ gameId: 'x', kickoff: '2026-10-16T20:00', sponsor: { name: 'S', cents: 9000, pledge: 'p' } }, { gameId: 'y', kickoff: '2026-10-16T18:00' }], new Set(['x', 'y'])).map((g) => g.gameId), ['y', 'x']);
 });
 
 test('pledges add up toward the estimate and flag faculty', () => {

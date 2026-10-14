@@ -5,13 +5,13 @@ import il from '@/content/directory/il.json';
 import { schools } from '@/content/schools';
 import { Swatch } from '@/components/conference/team-mark';
 
-type Il = { ihsaName: string; town: string; enrollment?: number; colors: string[]; type?: string };
+type Il = { ihsaId: string; ihsaName: string; town: string; enrollment?: number; colors: string[]; type?: string };
 
 /** Smallest Illinois public schools, by NCES enrollment, that have no page on the network yet. */
 function underTheRadar(n = 8) {
-  const onNetwork = new Set(schools.filter((s) => !s.sample && s.state === 'IL').map((s) => s.town.toLowerCase()));
+  const onNetwork = new Set(schools.map((s) => s.ihsaId).filter(Boolean));
   return (il as { schools: Il[] }).schools
-    .filter((s) => s.enrollment && s.type === 'Public' && !onNetwork.has(s.town.toLowerCase()))
+    .filter((s) => s.enrollment && s.type === 'Public' && !onNetwork.has(s.ihsaId))
     .sort((a, b) => a.enrollment! - b.enrollment!)
     .slice(0, n);
 }
@@ -51,7 +51,7 @@ export function Reality() {
           </div>
           <ol className="grid gap-px overflow-hidden rounded border border-line bg-line sm:grid-cols-2">
             {radar.map((s) => (
-              <li key={s.ihsaName} className="flex items-center justify-between gap-3 bg-ink px-4 py-3">
+              <li key={s.ihsaId} className="flex items-center justify-between gap-3 bg-ink px-4 py-3">
                 <span className="flex min-w-0 items-center gap-2 font-semibold text-bone"><Swatch school={{ name: s.ihsaName, colors: s.colors }} /> <span className="truncate">{s.ihsaName}</span></span>
                 <span className="num shrink-0 text-sm text-mute">{s.enrollment} students</span>
               </li>

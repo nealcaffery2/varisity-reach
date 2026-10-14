@@ -12,9 +12,17 @@ const GOLD_PRICE_CENTS = Number(Deno.env.get('GOLD_CARD_PRICE_CENTS') ?? '2000')
 
 serve(async (req) => {
   const b = await req.json().catch(() => null);
-  const returnUrl = String(b?.returnUrl ?? '');
+  // Stripe sends the buyer back here, so it must be this site and nothing else.
   const origin = Deno.env.get('SITE_ORIGIN');
-  if (origin && !returnUrl.startsWith(origin)) return fail('Unknown return address.');
+  if (!origin) return fail('Checkout is not configured yet.', 503);
+  let returnUrl: string;
+  try {
+    const u = new URL(String(b?.returnUrl ?? ''));
+    if (u.origin !== new URL(origin).origin) return fail('Unknown return address.');
+    returnUrl = `${u.origin}${u.pathname}`;
+  } catch {
+    return fail('Unknown return address.');
+  }
   const db = admin();
 
   if (b?.kind === 'donation') {
@@ -56,10 +64,14 @@ serve(async (req) => {
     // Separate charge and transfers: the platform collects, then the webhook
     // pays the photographer and the school their shares.
     const use = String(b.use) as LicenseUse;
-    if (!LICENSES[use]) return fail('Pick how you will use the photo.');
+    if (!Object.hasOwn(LICENSES, use)) return fail('Pick how you will use the photo.');
     const { data: item } = await db.from('media_items').select('id, kind, school_slug, caption, credit_name, minors_shown, release_on_file, status, creator_id').eq('id', String(b.itemId)).maybeSingle();
     if (!item || item.status !== 'approved') return fail('That photo is not for sale.', 404);
     if (item.kind !== 'photo') return fail('Video licenses are not on sale yet. Photos only for now.', 409);
+    // Both shares need somewhere to go before we take the buyer's money.
+    const { data: payout } = await db.from('media_creator_payouts').select('stripe_account').eq('user_id', item.creator_id).maybeSingle();
+    const { data: school } = await db.from('schools').select('stripe_account').eq('slug', item.school_slug).maybeSingle();
+    if (!payout?.stripe_account || !school?.stripe_account) return fail('This photo is not on sale until the photographer and the school finish payout setup.', 409);
     const ok = canLicense(use, { minorsShown: item.minors_shown, releaseOnFile: item.release_on_file });
     if (!ok.ok) return fail(ok.reason, 409);
     const price = LICENSES[use].priceCents;
@@ -79,11 +91,19 @@ serve(async (req) => {
   if (b?.kind === 'sponsor') {
     const cents = Math.round(Number(b.amountCents));
     if (!Number.isInteger(cents) || cents < 2500 || cents > 500_000) return fail('Game sponsorships run from $25 to $5,000.');
-    const { data: s } = await db.from('schools').select('slug, name, stripe_account, payee_name').eq('slug', String(b.school)).maybeSingle();
+    // The game, the school and the want must belong together.
+    const { data: game } = await db.from('games').select('id, home_school, away_school, status').eq('id', String(b.gameId)).maybeSingle();
+    if (!game) return fail('That game is not on the schedule.', 404);
+    if (game.status === 'final') return fail('That game is over.', 409);
+    const slug = String(b.school);
+    if (slug !== game.home_school && slug !== game.away_school) return fail('That school is not playing in this game.', 409);
+    const { data: want } = await db.from('school_wants').select('id, school_slug, title, status').eq('id', String(b.wantId ?? '')).maybeSingle();
+    if (!want || want.school_slug !== slug || want.status !== 'open') return fail('Pick an open item from this school’s wants board.', 409);
+    const { data: s } = await db.from('schools').select('slug, name, stripe_account, payee_name').eq('slug', slug).maybeSingle();
     if (!s?.stripe_account) return fail('This school is not set up to take sponsorships yet.', 409);
-    const pledge = String(b.pledge ?? '').trim().slice(0, 200);
+    const pledge = want.title;
     if (!pledge) return fail('Say what the school will buy with it.');
-    const { data: row, error } = await db.from('game_sponsors').insert({ game_id: String(b.gameId), school_slug: s.slug, sponsor_name: String(b.sponsor ?? '').slice(0, 80), cents, pledge, want_id: b.wantId || null }).select('id').single();
+    const { data: row, error } = await db.from('game_sponsors').insert({ game_id: game.id, school_slug: s.slug, sponsor_name: String(b.sponsor ?? '').slice(0, 80), cents, pledge, want_id: want.id }).select('id').single();
     if (error) throw error;
     const session = await stripe<{ url: string }>('/checkout/sessions', {
       mode: 'payment',

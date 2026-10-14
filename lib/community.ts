@@ -469,6 +469,8 @@ export const NOTICE_KINDS: { kind: string; label: string }[] = [
   { kind: 'address_viewed', label: 'A recruiter viewed the mailing address' },
   { kind: 'recruiter_feedback', label: 'Recruiter feedback on a reel' },
   { kind: 'film_request', label: 'Film requests (coaches)' },
+  { kind: 'grant_deadline', label: 'Grant deadlines near my school' },
+  { kind: 'coverage', label: 'Photo and video requests near me (photographers)' },
 ];
 export const demoPrefs = () => read<Prefs>('vr-prefs', { email: true, sms: false, push: true, muted: [] });
 
@@ -535,5 +537,167 @@ export async function saveSocials(slug: string, s: Socials): Promise<Result> {
   if (del.error) return { ok: false, reason: del.error.message };
   const rows = Object.entries(clean).map(([network, handle]) => ({ athlete_slug: slug, network, handle }));
   const { error } = rows.length ? await sb.from('athlete_socials').insert(rows) : { error: null };
+  return error ? { ok: false, reason: error.message } : { ok: true };
+}
+
+// ---- media partners, sponsors, pledges, creators, awards --------------------------------------
+
+export type PartnerLink = { gameId: string; partner: string; kind: 'radio' | 'stream' | 'live blog' | 'recap' | 'photos'; url: string };
+export const demoPartnerLinks = (gameId: string) => read<PartnerLink[]>(`vr-partner-${gameId}`, []);
+
+export async function listPartnerLinks(gameId: string): Promise<PartnerLink[]> {
+  const sb = supabase();
+  if (!sb) return demoPartnerLinks(gameId);
+  const { data } = await sb.from('game_partner_links').select('kind, url, media_partners(name)').eq('game_id', gameId);
+  return ((data ?? []) as unknown as { kind: PartnerLink['kind']; url: string; media_partners: { name: string } | null }[]).map((r) => ({ gameId, partner: r.media_partners?.name ?? 'Partner', kind: r.kind, url: r.url }));
+}
+
+/** A paper, radio station, school or coach links its broadcast or recap to a game. */
+export async function addPartnerLink(l: PartnerLink & { partnerKind: 'newspaper' | 'radio' | 'tv' | 'stream' | 'school' }): Promise<Result> {
+  if (!/^https:\/\//.test(l.url)) return { ok: false, reason: 'Paste a full https link.' };
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write(`vr-partner-${l.gameId}`, [...demoPartnerLinks(l.gameId), { gameId: l.gameId, partner: l.partner, kind: l.kind, url: l.url }]);
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  let { data: p } = await sb.from('media_partners').select('id').eq('name', l.partner).eq('created_by', uid).maybeSingle();
+  if (!p) {
+    const ins = await sb.from('media_partners').insert({ name: l.partner, kind: l.partnerKind, created_by: uid }).select('id').single();
+    if (ins.error) return { ok: false, reason: ins.error.message };
+    p = ins.data;
+  }
+  const { error } = await sb.from('game_partner_links').upsert({ game_id: l.gameId, partner_id: p!.id, kind: l.kind, url: l.url, added_by: uid });
+  return error ? { ok: false, reason: error.code === '42501' ? 'Verified coaches, reporters and partners can add links.' : error.message } : { ok: true };
+}
+
+export type Sponsorship = { gameId: string; school: string; sponsor: string; amountCents: number; pledge: string; wantId?: string };
+export const demoSponsors = () => read<Sponsorship[]>('vr-sponsors', []);
+
+/** Sponsor a game: top of the watch list, money to the school, for the thing the school pledged. */
+export async function sponsorGame(s: Sponsorship): Promise<{ ok: true; checkoutUrl?: string; demo?: true } | { ok: false; reason: string }> {
+  if (s.amountCents < 2500) return { ok: false, reason: 'Sponsorships start at $25.' };
+  if (!s.pledge.trim()) return { ok: false, reason: 'Pick what the money pays for.' };
+  const sb = supabase();
+  if (!sb) {
+    write('vr-sponsors', [...demoSponsors(), s]);
+    return { ok: true, demo: true };
+  }
+  const { data, error } = await sb.functions.invoke('checkout', { body: { kind: 'sponsor', ...s, returnUrl: `${window.location.origin}${window.location.pathname}` } });
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true, checkoutUrl: data.url };
+}
+
+export type WantPledge = { wantId: string; by: 'faculty' | 'booster' | 'sponsor' | 'family'; name: string; cents?: number; hours?: number; note?: string };
+export const demoPledges = (school: string) => read<WantPledge[]>(`vr-pledges-${school}`, []);
+
+export async function listPledges(school: string, wantIds: string[]): Promise<WantPledge[]> {
+  const sb = supabase();
+  if (!sb) return demoPledges(school);
+  if (!wantIds.length) return [];
+  const { data } = await sb.from('want_pledges').select('want_id, by_kind, name, cents, hours, note').in('want_id', wantIds);
+  return ((data ?? []) as { want_id: string; by_kind: WantPledge['by']; name: string; cents: number | null; hours: number | null; note: string | null }[]).map((r) => ({ wantId: r.want_id, by: r.by_kind, name: r.name, cents: r.cents ?? undefined, hours: r.hours ?? undefined, note: r.note ?? undefined }));
+}
+
+/** Faculty, boosters, sponsors and families pledge money or hours toward a want. Faculty pledges need a verified staff account. */
+export async function pledgeWant(school: string, p: WantPledge): Promise<Result> {
+  if (!p.cents && !p.hours) return { ok: false, reason: 'Pledge dollars, hours, or both.' };
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write(`vr-pledges-${school}`, [...demoPledges(school), p]);
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  const { error } = await sb.from('want_pledges').insert({ want_id: p.wantId, user_id: uid, by_kind: p.by, name: p.name, cents: p.cents ?? null, hours: p.hours ?? null, note: p.note });
+  return error ? { ok: false, reason: error.code === '42501' ? 'Faculty pledges need a verified school staff account.' : error.message } : { ok: true };
+}
+
+export type CreatorProfile = { name: string; kind: 'photographer' | 'videographer' | 'both'; town: string; miles: number; portfolio?: string; bio?: string };
+export const demoCreator = () => read<CreatorProfile | null>('vr-creator', null);
+
+export async function becomeCreator(c: CreatorProfile): Promise<Result> {
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write('vr-creator', c);
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  const { error } = await sb.from('media_creators').upsert({ user_id: uid, display_name: c.name, kind: c.kind, home_town: c.town, travel_miles: c.miles, portfolio_url: c.portfolio, bio: c.bio });
+  return error ? { ok: false, reason: error.message } : { ok: true };
+}
+
+export type Coverage = { id: string; school: string; sport: string; gameOn: string; location?: string; needs?: string; payCents: number; status: 'open' | 'claimed' | 'done'; claimedBy?: string };
+export const demoCoverage = () => read<Coverage[]>('vr-coverage', []);
+
+export async function listCoverage(seed: Coverage[]): Promise<Coverage[]> {
+  const sb = supabase();
+  if (!sb) return [...demoCoverage(), ...seed];
+  const { data } = await sb.from('coverage_requests').select('*').in('status', ['open', 'claimed']).order('game_on');
+  return ((data ?? []) as { id: string; school_slug: string; sport: string; game_on: string; location: string | null; needs: string | null; pay_cents: number; status: Coverage['status'] }[]).map((r) => ({ id: r.id, school: r.school_slug, sport: r.sport, gameOn: r.game_on, location: r.location ?? undefined, needs: r.needs ?? undefined, payCents: r.pay_cents, status: r.status }));
+}
+
+export async function requestCoverage(c: Omit<Coverage, 'id' | 'status'>): Promise<Result> {
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write('vr-coverage', [{ ...c, id: crypto.randomUUID(), status: 'open' }, ...demoCoverage()]);
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  const { error } = await sb.from('coverage_requests').insert({ school_slug: c.school, requested_by: uid, sport: c.sport, game_on: c.gameOn, location: c.location, needs: c.needs, pay_cents: c.payCents });
+  return error ? { ok: false, reason: error.code === '42501' ? 'Verified coaches and athletic directors can request coverage.' : error.message } : { ok: true };
+}
+
+export async function claimCoverage(id: string): Promise<Result> {
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write('vr-coverage', demoCoverage().map((c) => (c.id === id ? { ...c, status: 'claimed' as const, claimedBy: 'you' } : c)));
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  const { error } = await sb.from('coverage_requests').update({ status: 'claimed', claimed_by: uid }).eq('id', id).eq('status', 'open');
+  return error ? { ok: false, reason: error.code === '42501' ? 'Set up your photographer profile first.' : error.message } : { ok: true };
+}
+
+export async function buyLicense(itemId: string, use: string, org?: string): Promise<{ ok: true; checkoutUrl?: string; demo?: true } | { ok: false; reason: string }> {
+  const sb = supabase();
+  if (!sb) return { ok: true, demo: true };
+  const { data, error } = await sb.functions.invoke('checkout', { body: { kind: 'license', itemId, use, org, returnUrl: `${window.location.origin}${window.location.pathname}` } });
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true, checkoutUrl: data.url };
+}
+
+export type AwardEntry = { id: string; award: 'shakiest-camera' | 'loudest-parent'; reelId?: string; caption: string; school?: string; votes: number; at: string; sample?: boolean };
+export const myAwardVotes = (week: string) => read<Record<string, string>>(`vr-award-votes-${week}`, {});
+export const demoEntries = (week: string) => read<AwardEntry[]>(`vr-award-entries-${week}`, []);
+
+export async function voteAward(week: string, award: AwardEntry['award'], entryId: string): Promise<Result> {
+  const mine = myAwardVotes(week);
+  if (mine[award]) return { ok: false, reason: 'One vote per award each week.' };
+  const { sb, uid } = await signedIn();
+  if (sb) {
+    if (!uid) return { ok: false, reason: 'Sign in to vote, so every person counts once.' };
+    const { error } = await sb.from('award_votes').insert({ voter_id: uid, award, week, entry_id: entryId });
+    if (error) return { ok: false, reason: error.code === '23505' ? 'One vote per award each week.' : error.message };
+  }
+  write(`vr-award-votes-${week}`, { ...mine, [award]: entryId });
+  return { ok: true, ...(sb ? {} : { demo: true as const }) };
+}
+
+export async function enterAward(week: string, e: { award: AwardEntry['award']; reelId?: string; file?: File; caption: string; school?: string; consent: boolean }): Promise<Result> {
+  if (!e.consent) return { ok: false, reason: 'The person in the clip has to be in on the joke. Check the box once they said yes.' };
+  if (!e.reelId && !e.file) return { ok: false, reason: 'Pick a reel or upload the clip.' };
+  const { sb, uid } = await signedIn();
+  if (!sb) {
+    write(`vr-award-entries-${week}`, [...demoEntries(week), { id: crypto.randomUUID(), award: e.award, reelId: e.reelId, caption: e.caption, school: e.school, votes: 0, at: new Date().toISOString() }]);
+    return { ok: true, demo: true };
+  }
+  if (!uid) return { ok: false, reason: SIGN_IN };
+  let path: string | null = null;
+  if (e.file) {
+    path = `${week}/${crypto.randomUUID()}-${e.file.name.replace(/[^\w.-]/g, '_')}`;
+    const up = await sb.storage.from('award-clips').upload(path, e.file);
+    if (up.error) return { ok: false, reason: up.error.message };
+  }
+  const { error } = await sb.from('award_entries').insert({ award: e.award, week, school_slug: e.school, reel_id: e.reelId, video_path: path, caption: e.caption, submitted_by: uid, consent: true });
   return error ? { ok: false, reason: error.message } : { ok: true };
 }

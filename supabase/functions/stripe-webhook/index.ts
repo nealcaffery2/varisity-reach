@@ -2,7 +2,7 @@
 // and stored so the buyer's success page can claim the card. Idempotent on the
 // Checkout Session id. Deploy with --no-verify-jwt; Stripe signs instead.
 import { admin, json } from '../_shared/http.ts';
-import { verifyStripeSignature } from '../_shared/stripe.ts';
+import { stripe, stripeGet, verifyStripeSignature } from '../_shared/stripe.ts';
 import { sign } from '../_shared/gold-card.ts';
 
 Deno.serve(async (req) => {
@@ -26,6 +26,22 @@ Deno.serve(async (req) => {
     const payload = { school: m.school, holder: m.holder, season: `${end - 1}-${String(end).slice(2)}`, exp: `${end}-07-31`, n: crypto.randomUUID().slice(0, 8) };
     const token = await sign(payload, Deno.env.get('GOLD_CARD_SECRET')!);
     await db.from('gold_cards').upsert({ school_slug: m.school, holder: m.holder, email: m.email, season: payload.season, token, stripe_session: s.id }, { onConflict: 'stripe_session', ignoreDuplicates: true });
+  } else if (m.kind === 'license') {
+    const { data: item } = await db.from('media_items').select('id, creator_id, school_slug').eq('id', m.item_id).single();
+    const { data: lic } = await db
+      .from('media_licenses')
+      .upsert({ item_id: m.item_id, use: m.use, buyer_org: m.buyer_org || null, price_cents: s.amount_total, creator_cents: Number(m.creator_cents), school_cents: Number(m.school_cents), stripe_session: s.id }, { onConflict: 'stripe_session', ignoreDuplicates: true })
+      .select('id');
+    // Pay out only the first time this session is seen.
+    if (lic?.length && item) {
+      const pi = await stripeGet<{ latest_charge: string }>(`/payment_intents/${s.payment_intent}`);
+      const { data: creator } = await db.from('media_creators').select('stripe_account').eq('user_id', item.creator_id).maybeSingle();
+      const { data: school } = await db.from('schools').select('stripe_account').eq('slug', item.school_slug).maybeSingle();
+      if (creator?.stripe_account) await stripe('/transfers', { amount: Number(m.creator_cents), currency: 'usd', destination: creator.stripe_account, source_transaction: pi.latest_charge, transfer_group: `license-${item.id}` });
+      if (school?.stripe_account) await stripe('/transfers', { amount: Number(m.school_cents), currency: 'usd', destination: school.stripe_account, source_transaction: pi.latest_charge, transfer_group: `license-${item.id}` });
+    }
+  } else if (m.kind === 'sponsor') {
+    await db.from('game_sponsors').update({ status: 'paid', stripe_session: s.id }).eq('id', m.sponsor_id);
   }
   return json({ received: true });
 });

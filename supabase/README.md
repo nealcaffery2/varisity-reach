@@ -11,13 +11,14 @@ browser (demo mode) and the pages say so.
 | `migrations/001_core.sql` | Schools, profiles and verification, athletes, games, community score reports, paired streams, Underdog votes, fundraisers, gifts, gold cards. Row level security on every table. |
 | `migrations/002_community.sql` | Conference pick'em, fan brackets, free fantasy; family links and uploads; notifications; recruiter stars, messages and private mailing addresses (reveals logged, family told); reel engagement and save lists; boosters, alumni stories, Sibling Superstars; wishlists; private academic feedback; school claims, feeds and news; gold card merchant offers. |
 | `migrations/003_scouting.sql` | Recruiter needs and don't-want lists, highlight tapes (limits enforced by trigger), meet and greet requests, film requests to high school coaches, athlete socials, recruiter attention per school (counts only), notification settings, school wants board and votes, school board items. |
+| `migrations/004_media.sql` | Photo and video creators, coverage requests, media items (private originals, public previews), licenses, media partners and their game links, paid game sponsors with the school's pledge, pledges on the wants board (faculty pledges need a verified staff account), and the weekly Shakiest Camera and Loudest Parent awards (entries need the person's consent). |
 | `functions/recruiter-contact` | A verified college coach writes to an athlete. Checks the NCAA contact calendar (holds early messages), copies every linked parent, emails through Resend or queues a printed letter. |
 | `functions/feed-sync` | Reads school and newspaper RSS/Atom feeds into `news_items`. Run on a schedule with the service-role key, or by a verified AD for their school. |
 | `functions/score-report` | Takes a score from the stands. Sets role and trust on the server, enforces the game window and a 30-second rate limit, lets only a verified coach or scorer of either team lock, and updates every reporter's trust after a final. |
 | `functions/roster-import` | Claude reads a roster photo, PDF or Word text into athlete rows (structured output, `claude-opus-5-5`). Verified coaches only. Saves nothing. |
 | `functions/publish-roster` | Saves the rows a coach approved, stamped with who verified them. New athletes stay hidden until a media release is recorded. |
-| `functions/checkout` | Stripe Checkout for gifts and gold cards, as destination charges to the school's connected account. |
-| `functions/stripe-webhook` | Records gifts and signs gold cards when Stripe confirms payment. |
+| `functions/checkout` | Stripe Checkout for gifts, gold cards and game sponsors (destination charges to the school's connected account), and photo licenses (collected by the platform, then split by transfer). |
+| `functions/stripe-webhook` | Records gifts, signs gold cards, marks sponsors paid, and records licenses and pays the photographer (75%) and the school (20%) by transfer. A creator without a connected Stripe account is paid once they add one. |
 | `functions/gold-card-claim`, `gold-card-verify` | Hand the buyer their card; check a card for a merchant. The signing key never leaves the server. |
 | `functions/_shared` | Plumbing, a small Stripe client, and copies of `lib/consensus.ts` and `lib/gold-card.ts` (`pnpm sync:functions` keeps them in step; CI fails on drift). |
 

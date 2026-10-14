@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Camera, FileCsv, FilePdf, FileText, MicrosoftExcelLogo, SealCheck } from '@phosphor-icons/react/dist/ssr';
 import { Hero } from '@/components/home/hero';
 import { LiveStrip } from '@/components/home/live-strip';
+import { Reality } from '@/components/home/reality';
 import { FeaturedAthletes } from '@/components/home/featured-athletes';
 import { ReelStrip } from '@/components/reel-strip';
 import { CampaignCard } from '@/components/campaign-card';
@@ -43,6 +44,7 @@ export default function PlatformHome() {
         secondary={{ href: '/recruits/', label: 'Recruit board' }}
       />
       <LiveStrip />
+      <Reality />
 
       <section className="py-24 md:py-32" aria-labelledby="ud-h" style={schoolTheme(leaderSchool) as React.CSSProperties}>
         <div className="wrap grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">

@@ -11,6 +11,8 @@ import { consensus, gameWindow, sourceLine, type Board, type Report } from '@/li
 import { isLive, listReports, submitReport, watchReports } from '@/lib/backend';
 import { Scorebug } from './scorebug';
 import { StreamPanel } from './stream-panel';
+import { PartnerPanel, SponsorCard } from './partners';
+import { schoolBySlug } from '@/content/schools';
 import { asset } from '@/lib/asset';
 
 const PERIODS: Record<string, string[]> = {
@@ -86,6 +88,7 @@ export function GameCenter({ game }: { game: Game }) {
       <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
         <div className="min-w-0 space-y-8">
           <StreamPanel game={game} />
+          <PartnerPanel gameId={game.id} />
 
           {game.plays.length > 0 && (
             <section aria-labelledby="plays-h">
@@ -127,6 +130,8 @@ export function GameCenter({ game }: { game: Game }) {
               </ul>
             </details>
           </section>
+
+          {game.home.school && <SponsorCard gameId={game.id} school={game.home.school} schoolName={schoolBySlug(game.home.school)?.name ?? game.home.name} sample={game.sample} />}
 
           <OverlayCard gameId={game.id} />
 

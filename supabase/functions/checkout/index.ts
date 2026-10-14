@@ -1,8 +1,10 @@
-// Opens Stripe Checkout for a gift or a gold card. Money is a destination
+// Opens Stripe Checkout for a gift, a gold card, a photo license or a game
+// sponsorship. Money is a destination
 // charge to the school's (or booster club's) connected account, so funds land
 // with them; the platform keeps PLATFORM_FEE_PCT (0 by default).
 import { admin, fail, json, serve } from '../_shared/http.ts';
 import { stripe } from '../_shared/stripe.ts';
+import { LICENSES, canLicense, split, type LicenseUse } from '../_shared/media.ts';
 
 const FEE_PCT = Number(Deno.env.get('PLATFORM_FEE_PCT') ?? '0');
 const GOLD_PRICE_CENTS = Number(Deno.env.get('GOLD_CARD_PRICE_CENTS') ?? '2000');
@@ -45,6 +47,49 @@ serve(async (req) => {
       line_items: { 0: { quantity: 1, price_data: { currency: 'usd', unit_amount: GOLD_PRICE_CENTS, product_data: { name: `${s.name} gold card` } } } },
       payment_intent_data: { transfer_data: { destination: s.stripe_account }, application_fee_amount: Math.round((GOLD_PRICE_CENTS * FEE_PCT) / 100) || undefined },
       metadata: { kind: 'gold-card', school: s.slug, holder: String(b.holder ?? '').slice(0, 60), email: String(b.email ?? '').slice(0, 120) },
+    });
+    return json({ url: session.url });
+  }
+
+  if (b?.kind === 'license') {
+    // Separate charge and transfers: the platform collects, then the webhook
+    // pays the photographer and the school their shares.
+    const use = String(b.use) as LicenseUse;
+    if (!LICENSES[use]) return fail('Pick how you will use the photo.');
+    const { data: item } = await db.from('media_items').select('id, school_slug, caption, credit_name, minors_shown, release_on_file, status, creator_id').eq('id', String(b.itemId)).maybeSingle();
+    if (!item || item.status !== 'approved') return fail('That photo is not for sale.', 404);
+    const ok = canLicense(use, { minorsShown: item.minors_shown, releaseOnFile: item.release_on_file });
+    if (!ok.ok) return fail(ok.reason, 409);
+    const price = LICENSES[use].priceCents;
+    const s = split(price);
+    const session = await stripe<{ url: string }>('/checkout/sessions', {
+      mode: 'payment',
+      success_url: `${returnUrl}?licensed=${item.id}`,
+      cancel_url: returnUrl,
+      customer_email: b.email ? String(b.email) : undefined,
+      line_items: { 0: { quantity: 1, price_data: { currency: 'usd', unit_amount: price, product_data: { name: `${LICENSES[use].label} license: ${item.caption ?? 'photo'}`, description: `Photo by ${item.credit_name}. ${LICENSES[use].terms}` } } } },
+      payment_intent_data: { transfer_group: `license-${item.id}` },
+      metadata: { kind: 'license', item_id: item.id, use, buyer_org: String(b.org ?? '').slice(0, 80), creator_cents: String(s.creator), school_cents: String(s.school) },
+    });
+    return json({ url: session.url });
+  }
+
+  if (b?.kind === 'sponsor') {
+    const cents = Math.round(Number(b.amountCents));
+    if (!Number.isInteger(cents) || cents < 2500 || cents > 500_000) return fail('Game sponsorships run from $25 to $5,000.');
+    const { data: s } = await db.from('schools').select('slug, name, stripe_account, payee_name').eq('slug', String(b.school)).maybeSingle();
+    if (!s?.stripe_account) return fail('This school is not set up to take sponsorships yet.', 409);
+    const pledge = String(b.pledge ?? '').trim().slice(0, 200);
+    if (!pledge) return fail('Say what the school will buy with it.');
+    const { data: row, error } = await db.from('game_sponsors').insert({ game_id: String(b.gameId), school_slug: s.slug, sponsor_name: String(b.sponsor ?? '').slice(0, 80), cents, pledge, want_id: b.wantId || null }).select('id').single();
+    if (error) throw error;
+    const session = await stripe<{ url: string }>('/checkout/sessions', {
+      mode: 'payment',
+      success_url: `${returnUrl}?sponsored=1`,
+      cancel_url: returnUrl,
+      line_items: { 0: { quantity: 1, price_data: { currency: 'usd', unit_amount: cents, product_data: { name: `Game sponsor: ${s.name}`, description: `Paid to ${s.payee_name ?? 'the school'} for: ${pledge}` } } } },
+      payment_intent_data: { transfer_data: { destination: s.stripe_account }, application_fee_amount: Math.round((cents * FEE_PCT) / 100) || undefined },
+      metadata: { kind: 'sponsor', sponsor_id: row.id },
     });
     return json({ url: session.url });
   }

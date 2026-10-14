@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:copy": "tsx tools/check-copy.ts",
-    "test": "tsx tools/no-ai-slop.test.ts && tsx tools/filters.test.ts && tsx tools/consensus.test.ts && tsx tools/streams.test.ts && tsx tools/fundraise.test.ts && tsx tools/compare.test.ts && tsx tools/roster.test.ts && tsx tools/bracket.test.ts && tsx tools/school-data.test.ts && tsx tools/recommend.test.ts && tsx tools/scout.test.ts && tsx tools/sync-functions.ts --check",
+    "test": "tsx tools/no-ai-slop.test.ts && tsx tools/filters.test.ts && tsx tools/consensus.test.ts && tsx tools/streams.test.ts && tsx tools/fundraise.test.ts && tsx tools/compare.test.ts && tsx tools/roster.test.ts && tsx tools/bracket.test.ts && tsx tools/school-data.test.ts && tsx tools/recommend.test.ts && tsx tools/scout.test.ts && tsx tools/media.test.ts && tsx tools/sync-functions.ts --check",
     "sync:functions": "tsx tools/sync-functions.ts"
   },
   "dependencies": {

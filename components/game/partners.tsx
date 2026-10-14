@@ -1,0 +1,101 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { ArrowSquareOut, Megaphone, Radio } from '@phosphor-icons/react';
+import { addPartnerLink, demoSponsors, listPartnerLinks, sponsorGame, type PartnerLink, type Sponsorship } from '@/lib/community';
+
+const KINDS: PartnerLink['kind'][] = ['radio', 'stream', 'live blog', 'recap', 'photos'];
+
+/** Local papers, radio stations, the school and coaches link their coverage to the game. */
+export function PartnerPanel({ gameId }: { gameId: string }) {
+  const [links, setLinks] = useState<PartnerLink[]>([]);
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ partner: '', partnerKind: 'radio' as 'newspaper' | 'radio' | 'tv' | 'stream' | 'school', kind: 'radio' as PartnerLink['kind'], url: '' });
+  const [msg, setMsg] = useState('');
+  useEffect(() => {
+    listPartnerLinks(gameId).then(setLinks);
+  }, [gameId]);
+
+  return (
+    <section aria-labelledby="partners-h">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 id="partners-h" className="display text-3xl">Local coverage</h2>
+        <button type="button" className="link-u min-h-11 text-sm text-mute hover:text-bone" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Close' : 'Add your broadcast or story'}</button>
+      </div>
+      {links.length === 0 ? (
+        <p className="mt-3 text-sm text-mute">No radio call, live blog or recap linked yet. Newspapers, radio stations and the school can add theirs.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-line border-y border-line">
+          {links.map((l, i) => (
+            <li key={i}><a className="flex min-h-12 items-center justify-between gap-3 py-2 text-bone hover:text-accent" href={l.url} target="_blank" rel="noreferrer"><span className="flex items-center gap-2"><Radio size={16} aria-hidden /> {l.partner}</span><span className="flex items-center gap-1 text-sm text-mute">{l.kind} <ArrowSquareOut size={12} aria-label="opens in a new tab" /></span></a></li>
+          ))}
+        </ul>
+      )}
+      {open && (
+        <form
+          className="mt-4 grid gap-3 rounded border border-line bg-ink-2 p-4 sm:grid-cols-2"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const r = await addPartnerLink({ gameId, ...f });
+            setMsg(r.ok ? 'Linked.' : r.reason);
+            if (r.ok) { setOpen(false); listPartnerLinks(gameId).then(setLinks); }
+          }}
+        >
+          <div><label htmlFor="pt-name" className="field-label">Outlet</label><input id="pt-name" required className="field" value={f.partner} onChange={(e) => setF({ ...f, partner: e.target.value })} placeholder="WSMI 106.1" /></div>
+          <div><label htmlFor="pt-pk" className="field-label">You are</label><select id="pt-pk" className="field" value={f.partnerKind} onChange={(e) => setF({ ...f, partnerKind: e.target.value as typeof f.partnerKind })}><option value="radio">Radio</option><option value="newspaper">Newspaper</option><option value="tv">TV</option><option value="stream">Streamer</option><option value="school">The school or a coach</option></select></div>
+          <div><label htmlFor="pt-kind" className="field-label">Link type</label><select id="pt-kind" className="field" value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value as PartnerLink['kind'] })}>{KINDS.map((k) => <option key={k}>{k}</option>)}</select></div>
+          <div><label htmlFor="pt-url" className="field-label">Link</label><input id="pt-url" type="url" required className="field" value={f.url} onChange={(e) => setF({ ...f, url: e.target.value })} /></div>
+          <button className="btn btn-primary sm:col-span-2">Link it</button>
+        </form>
+      )}
+      <p className="mt-2 min-h-5 text-sm text-mute" role="status">{msg}</p>
+    </section>
+  );
+}
+
+const PLEDGES = ['New helmets', 'Practice equipment', 'Bus to the playoff game', 'Film camera and tripod', 'Cleats for kids who need them'];
+
+/** A business sponsors this game: top of the watch list, money to the school for a pledge the school keeps. */
+export function SponsorCard({ gameId, school, schoolName, sample }: { gameId: string; school: string; schoolName: string; sample: boolean }) {
+  const [current, setCurrent] = useState<Sponsorship | undefined>();
+  const [f, setF] = useState({ sponsor: '', dollars: '100', pledge: PLEDGES[0] });
+  const [msg, setMsg] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrent(demoSponsors().filter((s) => s.gameId === gameId).sort((a, b) => b.amountCents - a.amountCents)[0]);
+  }, [gameId]);
+
+  return (
+    <section className="rounded border border-line p-5" aria-labelledby="sponsor-h">
+      <h2 id="sponsor-h" className="display text-3xl">Sponsor this game</h2>
+      {current ? (
+        <p className="mt-2 text-sm text-mute"><Megaphone size={14} className="inline text-accent" aria-hidden /> <span className="text-bone">{current.sponsor}</span> put ${Math.round(current.amountCents / 100)} toward {current.pledge.toLowerCase()} for {schoolName}.</p>
+      ) : (
+        <p className="mt-2 text-sm text-mute">Your name tops the watch list for this game. Every dollar goes to {schoolName} for the thing you pick below.</p>
+      )}
+      <form
+        className="mt-4 grid gap-3"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          const r = await sponsorGame({ gameId, school, sponsor: f.sponsor, amountCents: Math.round(Number(f.dollars) * 100), pledge: f.pledge });
+          setBusy(false);
+          if (!r.ok) return setMsg(r.reason);
+          if (r.checkoutUrl) return window.location.assign(r.checkoutUrl);
+          setCurrent(demoSponsors().filter((s) => s.gameId === gameId).sort((a, b) => b.amountCents - a.amountCents)[0]);
+          setMsg(sample ? 'Sample game: saved in this browser only.' : 'Saved in this browser (demo mode).');
+        }}
+      >
+        <div><label htmlFor="sp-name" className="field-label">Business or family name</label><input id="sp-name" required maxLength={80} className="field" value={f.sponsor} onChange={(e) => setF({ ...f, sponsor: e.target.value })} /></div>
+        <div className="grid grid-cols-[6rem_1fr] gap-3">
+          <div><label htmlFor="sp-amt" className="field-label">Dollars</label><input id="sp-amt" inputMode="numeric" className="field num" value={f.dollars} onChange={(e) => setF({ ...f, dollars: e.target.value.replace(/\D/g, '') })} /></div>
+          <div><label htmlFor="sp-pledge" className="field-label">Pays for</label><select id="sp-pledge" className="field" value={f.pledge} onChange={(e) => setF({ ...f, pledge: e.target.value })}>{PLEDGES.map((p) => <option key={p}>{p}</option>)}</select></div>
+        </div>
+        <button className="btn btn-primary" disabled={busy}>{busy ? 'Opening checkout…' : 'Sponsor'}</button>
+        <p className="min-h-5 text-sm text-mute" role="status">{msg}</p>
+      </form>
+    </section>
+  );
+}

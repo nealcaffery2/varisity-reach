@@ -1,0 +1,16 @@
+# Settings the Supabase CLI reads on `supabase functions deploy`.
+[functions.stripe-webhook]
+verify_jwt = false
+
+# Readable by signed-out fans and merchants.
+[functions.score-report]
+verify_jwt = false
+
+[functions.gold-card-verify]
+verify_jwt = false
+
+[functions.gold-card-claim]
+verify_jwt = false
+
+[functions.checkout]
+verify_jwt = false

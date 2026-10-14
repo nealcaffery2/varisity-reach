@@ -10,7 +10,7 @@ import type { Athlete } from '@/lib/types';
 
 export const athletes: Athlete[] = [
   {
-    slug: 'cade-rakers', first: 'Cade', last: 'Rakers', sample: true,
+    slug: 'cade-rakers', school: 'hillsboro', first: 'Cade', last: 'Rakers', sample: true,
     gradYear: 2027, sports: ['football', 'track-and-field'], position: 'RB / SS', jersey: 22,
     heightIn: 71, weightLb: 186, gpa: 3.62, act: 25, coreGpa: 3.55, intendedMajor: 'Exercise science', ncaaEligibility: 'Registered',
     measurables: [{ label: '40 yd', value: '4.58' }, { label: 'Pro agility', value: '4.21' }, { label: 'Vertical', value: '33.5 in' }, { label: 'Bench', value: '245 lb' }, { label: 'Squat', value: '405 lb' }],
@@ -25,7 +25,7 @@ export const athletes: Athlete[] = [
     socials: { x: 'caderakers22', hudl: 'https://www.hudl.com' },
   },
   {
-    slug: 'avery-niehaus', first: 'Avery', last: 'Niehaus', sample: true,
+    slug: 'avery-niehaus', school: 'hillsboro', first: 'Avery', last: 'Niehaus', sample: true,
     gradYear: 2027, sports: ['football', 'track-and-field'], position: 'OT / DT', jersey: 74,
     heightIn: 77, weightLb: 287, gpa: 3.41, act: 23, intendedMajor: 'Agribusiness', ncaaEligibility: 'Registered',
     measurables: [{ label: '40 yd', value: '5.22' }, { label: 'Wingspan', value: '81 in' }, { label: 'Bench', value: '315 lb' }, { label: 'Squat', value: '485 lb' }, { label: 'Power clean', value: '275 lb' }],
@@ -39,7 +39,7 @@ export const athletes: Athlete[] = [
     reels: ['r2'], coach: 'Joe Reed', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'jace-wernsing', first: 'Jace', last: 'Wernsing', sample: true,
+    slug: 'jace-wernsing', school: 'hillsboro', first: 'Jace', last: 'Wernsing', sample: true,
     gradYear: 2028, sports: ['boys-soccer', 'boys-basketball'], position: 'Forward', jersey: 9,
     heightIn: 70, weightLb: 158, gpa: 3.88, act: 28, intendedMajor: 'Mechanical engineering', ncaaEligibility: 'In progress',
     measurables: [{ label: '40 yd', value: '4.71' }, { label: 'Beep test', value: 'Level 12.4' }, { label: 'Vertical', value: '29 in' }],
@@ -53,7 +53,7 @@ export const athletes: Athlete[] = [
     reels: ['r6'], coach: 'Jason Burke', hometown: 'Coffeen, IL',
   },
   {
-    slug: 'reese-kirchner', first: 'Reese', last: 'Kirchner', sample: true,
+    slug: 'reese-kirchner', school: 'hillsboro', first: 'Reese', last: 'Kirchner', sample: true,
     gradYear: 2027, sports: ['girls-tennis', 'girls-basketball'], position: 'No. 1 singles', jersey: 3,
     heightIn: 67, weightLb: 131, gpa: 3.97, act: 31, sat: 1390, intendedMajor: 'Nursing', ncaaEligibility: 'Registered',
     measurables: [{ label: 'UTR', value: '7.42' }, { label: 'Serve', value: '86 mph' }],
@@ -67,7 +67,7 @@ export const athletes: Athlete[] = [
     reels: ['r16'], coach: 'Joe Mattson', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'brennan-hough', first: 'Brennan', last: 'Hough', sample: true,
+    slug: 'brennan-hough', school: 'hillsboro', first: 'Brennan', last: 'Hough', sample: true,
     gradYear: 2027, sports: ['boys-basketball', 'baseball'], position: 'Guard', jersey: 11,
     heightIn: 74, weightLb: 172, gpa: 3.29, act: 22, intendedMajor: 'Business', ncaaEligibility: 'Registered',
     measurables: [{ label: 'Wingspan', value: '77.5 in' }, { label: 'Vertical', value: '31 in' }, { label: 'Lane agility', value: '11.03' }],
@@ -81,7 +81,7 @@ export const athletes: Athlete[] = [
     reels: ['r10'], coach: 'Corbin Govaia', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'kaylee-schaefer', first: 'Kaylee', last: 'Schaefer', sample: true,
+    slug: 'kaylee-schaefer', school: 'hillsboro', first: 'Kaylee', last: 'Schaefer', sample: true,
     gradYear: 2028, sports: ['girls-basketball', 'volleyball'], position: 'Forward', jersey: 24,
     heightIn: 72, weightLb: 158, gpa: 3.74, act: 26, intendedMajor: 'Biology', ncaaEligibility: 'In progress',
     measurables: [{ label: 'Wingspan', value: '73 in' }, { label: 'Vertical', value: '22.5 in' }, { label: 'Approach jump', value: '9 ft 8 in' }],
@@ -94,7 +94,7 @@ export const athletes: Athlete[] = [
     reels: ['r11'], coach: 'Bret Tuetken', hometown: 'Irving, IL',
   },
   {
-    slug: 'maddox-kessinger', first: 'Maddox', last: 'Kessinger', sample: true,
+    slug: 'maddox-kessinger', school: 'hillsboro', first: 'Maddox', last: 'Kessinger', sample: true,
     gradYear: 2027, sports: ['wrestling', 'football'], position: '157 lb', jersey: 157,
     heightIn: 69, weightLb: 157, gpa: 3.18, act: 21, intendedMajor: 'Criminal justice', ncaaEligibility: 'Registered',
     measurables: [{ label: 'Bench', value: '235 lb' }, { label: 'Squat', value: '375 lb' }, { label: 'Pull-ups', value: '24' }],
@@ -108,7 +108,7 @@ export const athletes: Athlete[] = [
     reels: ['r14'], coach: 'Garrett Young', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'grady-luebbert', first: 'Grady', last: 'Luebbert', sample: true,
+    slug: 'grady-luebbert', school: 'hillsboro', first: 'Grady', last: 'Luebbert', sample: true,
     gradYear: 2028, sports: ['wrestling'], position: '190 lb', jersey: 190,
     heightIn: 72, weightLb: 189, gpa: 3.52, act: 24, intendedMajor: 'Undecided', ncaaEligibility: 'Not yet',
     measurables: [{ label: 'Bench', value: '255 lb' }, { label: 'Deadlift', value: '445 lb' }],
@@ -119,7 +119,7 @@ export const athletes: Athlete[] = [
     reels: ['r15'], coach: 'Garrett Young', hometown: 'Butler, IL',
   },
   {
-    slug: 'tatum-bohlen', first: 'Tatum', last: 'Bohlen', sample: true,
+    slug: 'tatum-bohlen', school: 'hillsboro', first: 'Tatum', last: 'Bohlen', sample: true,
     gradYear: 2027, sports: ['track-and-field', 'volleyball'], position: 'Hurdles / 400', jersey: 8,
     heightIn: 68, weightLb: 134, gpa: 3.91, act: 29, intendedMajor: 'Physical therapy', ncaaEligibility: 'Registered',
     measurables: [{ label: 'Vertical', value: '24 in' }, { label: 'Approach jump', value: '9 ft 11 in' }],
@@ -130,7 +130,7 @@ export const athletes: Athlete[] = [
     reels: ['r12'], coach: 'Katie Homa', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'owen-fesser', first: 'Owen', last: 'Fesser', sample: true,
+    slug: 'owen-fesser', school: 'hillsboro', first: 'Owen', last: 'Fesser', sample: true,
     gradYear: 2027, sports: ['track-and-field', 'football'], position: 'Sprints', jersey: 4,
     heightIn: 70, weightLb: 165, gpa: 3.07, act: 20, intendedMajor: 'Sports management', ncaaEligibility: 'Registered',
     measurables: [{ label: '40 yd', value: '4.49' }, { label: 'Vertical', value: '35 in' }],
@@ -141,7 +141,7 @@ export const athletes: Athlete[] = [
     reels: ['r13'], coach: 'Zach Reed', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'brooklyn-haller', first: 'Brooklyn', last: 'Haller', sample: true,
+    slug: 'brooklyn-haller', school: 'hillsboro', first: 'Brooklyn', last: 'Haller', sample: true,
     gradYear: 2028, sports: ['girls-flag-football', 'softball'], position: 'DB / WR', jersey: 7,
     heightIn: 65, weightLb: 127, gpa: 3.66, act: 25, intendedMajor: 'Education', ncaaEligibility: 'In progress',
     measurables: [{ label: '40 yd', value: '5.31' }, { label: 'Home to first', value: '2.93' }],
@@ -154,7 +154,7 @@ export const athletes: Athlete[] = [
     reels: ['r3'], coach: 'Kurt Compton', hometown: 'Hillsboro, IL',
   },
   {
-    slug: 'ty-roesch', first: 'Ty', last: 'Roesch', sample: true,
+    slug: 'ty-roesch', school: 'hillsboro', first: 'Ty', last: 'Roesch', sample: true,
     gradYear: 2027, sports: ['boys-tennis', 'boys-golf'], position: 'No. 1 doubles', jersey: 12,
     heightIn: 73, weightLb: 162, gpa: 4.0, act: 33, sat: 1480, intendedMajor: 'Computer science', ncaaEligibility: 'Registered',
     measurables: [{ label: 'UTR', value: '8.11' }, { label: 'Serve', value: '104 mph' }],
@@ -167,7 +167,90 @@ export const athletes: Athlete[] = [
     bio: 'Left-handed doubles player who won the sectional title as a junior. Plays on the golf team in the fall.',
     reels: ['r17'], coach: 'Joe Mattson', hometown: 'Hillsboro, IL',
   },
+
+  // ---- Sample athletes at the invented schools: small towns, big numbers. ----
+  {
+    slug: 'deshawn-pruitt', school: 'cedar-fork', first: 'DeShawn', last: 'Pruitt', sample: true,
+    gradYear: 2027, sports: ['football', 'track-and-field'], position: 'RB', jersey: 5,
+    heightIn: 71, weightLb: 194, gpa: 3.44, act: 22, intendedMajor: 'Kinesiology', ncaaEligibility: 'Registered',
+    measurables: [{ label: '40 yd', value: '4.47' }, { label: 'Pro agility', value: '4.12' }, { label: 'Vertical', value: '36 in' }, { label: 'Bench', value: '275 lb' }, { label: 'Squat', value: '455 lb' }],
+    seasons: [
+      { year: '2025-26', level: 'Varsity', stats: { rushYds: 2311, rushTd: 31, recYds: 288, tackles: 12 } },
+      { year: '2024-25', level: 'Varsity', stats: { rushYds: 1467, rushTd: 19, recYds: 140 } },
+    ],
+    records: [{ label: '100M', value: '10.81' }, { label: '200M', value: '22.04' }],
+    awards: ['2A all-state first team (2025)', 'District offensive MVP (2025)'],
+    bio: 'Averaged 9.1 yards a carry on 254 attempts as a junior for a school of 231 students. Has not played a snap against a 5A or 6A defense.',
+    reels: ['r2'], coach: 'Sample coach', hometown: 'Cedar Fork, TX',
+    verified: { by: 'Head coach (sample)', role: 'coach', on: '2026-09-30' },
+  },
+  {
+    slug: 'mara-lindqvist', school: 'prairie-bend', first: 'Mara', last: 'Lindqvist', sample: true,
+    gradYear: 2027, sports: ['girls-basketball', 'volleyball', 'track-and-field'], position: 'Guard', jersey: 14,
+    heightIn: 70, weightLb: 146, gpa: 3.96, act: 30, intendedMajor: 'Chemical engineering', ncaaEligibility: 'Registered',
+    measurables: [{ label: 'Wingspan', value: '71.5 in' }, { label: 'Vertical', value: '25 in' }, { label: 'Lane agility', value: '10.84' }],
+    seasons: [
+      { year: '2025-26', level: 'Varsity', stats: { ppg: 26.4, rpg: 7.2, apg: 5.1, spg: 3.3, fgPct: 49.8, threePct: 40.6 } },
+      { year: '2024-25', level: 'Varsity', stats: { ppg: 19.7, rpg: 6.0, apg: 4.2, spg: 2.8, fgPct: 46.1, threePct: 36.9 } },
+    ],
+    records: [{ label: 'Career points', value: '1,288' }, { label: 'Single game', value: '44', note: 'vs sample opponent, Jan 2026' }],
+    awards: ['Class A all-state first team (2026)', 'Conference player of the year (2026)'],
+    bio: 'Scored 26 a game as a junior in a 1A gym that seats 400. Runs the 400 and the 4x400 in the spring.',
+    reels: ['r11'], coach: 'Sample coach', hometown: 'Prairie Bend, IA',
+    verified: { by: 'Head coach (sample)', role: 'coach', on: '2026-03-12' },
+  },
+  {
+    slug: 'colt-harnisch', school: 'kessler-valley', first: 'Colt', last: 'Harnisch', sample: true,
+    gradYear: 2028, sports: ['wrestling', 'football'], position: '165 lb', jersey: 165,
+    heightIn: 70, weightLb: 165, gpa: 3.58, act: 24, intendedMajor: 'Agronomy', ncaaEligibility: 'In progress',
+    measurables: [{ label: 'Bench', value: '245 lb' }, { label: 'Squat', value: '405 lb' }, { label: 'Pull-ups', value: '27' }],
+    seasons: [{ year: '2025-26', level: 'Varsity', stats: { wins: 44, losses: 2, pins: 31, takedowns: 139 } }],
+    records: [{ label: 'Career record', value: '44-2' }, { label: 'Fastest fall', value: '0:17' }],
+    awards: ['3A state champion, 165 (2026, sample)', 'League outstanding wrestler (2026)'],
+    bio: 'State champion as a sophomore. Both losses came at an open tournament against wrestlers from 6A programs, by a combined three points.',
+    reels: ['r15'], coach: 'Sample coach', hometown: 'Kessler Valley, KS',
+    verified: { by: 'Sports reporter (sample)', role: 'reporter', on: '2026-02-28' },
+  },
+  {
+    slug: 'jalen-okafor', school: 'elm-hollow', first: 'Jalen', last: 'Okafor', sample: true,
+    gradYear: 2027, sports: ['track-and-field', 'football'], position: 'Sprints / WR', jersey: 1,
+    heightIn: 72, weightLb: 172, gpa: 3.71, act: 26, intendedMajor: 'Business analytics', ncaaEligibility: 'Registered',
+    measurables: [{ label: '40 yd', value: '4.39' }, { label: 'Vertical', value: '38 in' }, { label: 'Broad jump', value: '10 ft 6 in' }],
+    seasons: [{ year: '2025-26', level: 'Varsity', stats: { m100: 10.52, m200: 21.33, m400: 48.9, longJump: 23.1 } }],
+    records: [{ label: '100M', value: '10.52', note: 'Sectional final, wind legal' }, { label: '200M', value: '21.33' }, { label: 'Long jump', value: '23-1.25' }],
+    awards: ['State finalist, 100M (2026, sample)', 'All-conference receiver (2025)'],
+    bio: 'Ran 10.52 at a sectional with no other school above 2A in the field. Caught 61 passes as a junior receiver.',
+    reels: ['r13'], coach: 'Sample coach', hometown: 'Elm Hollow, IN',
+  },
+  {
+    slug: 'brynn-aldana', school: 'cedar-fork', first: 'Brynn', last: 'Aldana', sample: true,
+    gradYear: 2028, sports: ['girls-tennis', 'volleyball'], position: 'No. 1 singles', jersey: 2,
+    heightIn: 66, weightLb: 128, gpa: 4.0, act: 32, intendedMajor: 'Pre-med', ncaaEligibility: 'In progress',
+    measurables: [{ label: 'UTR', value: '8.6' }, { label: 'Serve', value: '91 mph' }],
+    seasons: [{ year: '2026-27', level: 'Varsity', stats: { singlesW: 24, singlesL: 1, doublesW: 2, doublesL: 0 } }],
+    records: [{ label: 'Career singles', value: '41-3' }],
+    awards: ['2A regional champion, singles (2026, sample)'],
+    bio: 'Has lost one high school singles match this fall. Trains two hours away on weekends because the town has two public courts.',
+    reels: ['r17'], coach: 'Sample coach', hometown: 'Cedar Fork, TX',
+  },
+  {
+    slug: 'tucker-voss', school: 'prairie-bend', first: 'Tucker', last: 'Voss', sample: true,
+    gradYear: 2027, sports: ['football', 'baseball'], position: 'QB', jersey: 7,
+    heightIn: 75, weightLb: 205, gpa: 3.83, act: 28, intendedMajor: 'Finance', ncaaEligibility: 'Registered',
+    measurables: [{ label: '40 yd', value: '4.71' }, { label: 'Throw velocity', value: '58 mph' }, { label: 'Pitching velo', value: '86 mph' }],
+    seasons: [
+      { year: '2025-26', level: 'Varsity', stats: { passYds: 3108, passTd: 36, rushYds: 611, rushTd: 9 } },
+      { year: '2024-25', level: 'Varsity', stats: { passYds: 2240, passTd: 22, rushYds: 380, rushTd: 5 } },
+    ],
+    records: [{ label: 'Completion %', value: '67.4' }],
+    awards: ['Class A all-state quarterback (2025, sample)'],
+    bio: 'Threw for 3,108 yards in 11 games behind a line that started two freshmen. 36 touchdowns to 5 interceptions.',
+    reels: ['r1'], coach: 'Sample coach', hometown: 'Prairie Bend, IA',
+    verified: { by: 'Head coach (sample)', role: 'coach', on: '2026-10-05' },
+  },
 ];
 
 export const athleteBySlug = (slug: string) => athletes.find((a) => a.slug === slug);
 export const fullName = (a: Pick<Athlete, 'first' | 'last'>) => `${a.first} ${a.last}`;
+
+export const athletesAt = (school: string) => athletes.filter((a) => a.school === school);

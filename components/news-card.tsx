@@ -9,7 +9,7 @@ export function NewsCard({ item, wide }: { item: NewsItem; wide?: boolean }) {
   const sport = item.sport ? sportBySlug(item.sport) : undefined;
   return (
     <Link
-      href={`/news/${item.slug}/`}
+      href={`/${item.school}/news/${item.slug}/`}
       data-slide
       className={`group relative flex shrink-0 snap-start flex-col justify-end overflow-hidden rounded bg-ink-2 ${
         wide ? 'h-[26rem] w-[86vw] md:h-[30rem] md:w-[40rem]' : 'h-[26rem] w-[78vw] md:h-[30rem] md:w-[24rem]'
@@ -29,13 +29,13 @@ export function NewsCard({ item, wide }: { item: NewsItem; wide?: boolean }) {
           <div className="absolute inset-0 bg-gradient-to-t from-ink from-25% via-ink/80 to-ink/10" />
         </>
       ) : (
-        <div aria-hidden className="display absolute -right-4 -top-6 text-[11rem] leading-none text-ink-3 transition-colors duration-500 group-hover:text-orange/15">
+        <div aria-hidden className="display absolute -right-4 -top-6 text-[11rem] leading-none text-ink-3 transition-colors duration-500 group-hover:text-accent/15">
           {(sport?.short ?? 'HHS').split(' ')[0]}
         </div>
       )}
       <div className="relative p-6">
         <p className="flex items-center gap-2 text-sm text-mute">
-          {sport && <span className="text-orange">{sport.name}</span>}
+          {sport && <span className="text-accent">{sport.name}</span>}
           {sport && item.date && <span aria-hidden>·</span>}
           {item.date ? <time dateTime={item.date}>{shortDate(item.date)}</time> : !sport && <span>From the archive</span>}
         </p>

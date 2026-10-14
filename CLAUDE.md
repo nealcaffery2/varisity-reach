@@ -1,24 +1,43 @@
-# Hiltoppers
+# Varsity Reach
 
 Static Next.js site (App Router, `output: 'export'`), Tailwind v4, Motion,
-Lenis. Content is TypeScript in `content/`; there is no database.
+Lenis. Content and sample data are TypeScript in `content/`. The live backend
+is Supabase (`supabase/`: migrations, Deno edge functions); `lib/backend.ts`
+is the only door to it and falls back to demo mode when unconfigured.
+
+Routes: `app/(platform)/` is the network (home, recruits, athletes, games,
+spotlight, compare, coach, fundraise, gold-card, schools, join).
+`app/[school]/` is each school's own site, themed by `schoolTheme()`.
+`app/overlay/` is the bare OBS scoreboard.
+
+Pure logic with tests in `tools/*.test.ts`: filters, consensus scoring,
+streams, fundraising and gold cards, compare, roster parsing. Edge functions
+share `lib/consensus.ts` and `lib/gold-card.ts` through copies in
+`supabase/functions/_shared`; run `pnpm sync:functions` after editing them.
+Roster reading calls Claude (`claude-opus-5-5`, structured output) from
+`supabase/functions/roster-import`.
 
 ```bash
 pnpm install
 pnpm dev            # localhost:3000
 pnpm lint && pnpm typecheck && pnpm test && pnpm check:copy
 pnpm build          # writes out/
+cd supabase/functions && deno check --config deno.json */index.ts
 ```
 
 ## Content
 
-- `content/site.ts` school facts and links. `content/sports.ts` teams,
-  coaches, schedule PDFs. `content/news.ts` stories and district dates.
-  `content/athletes.ts` profiles. `content/reels.ts` clips.
+- `content/schools.ts` schools and colors. `content/sports.ts` teams,
+  coaches, schedule PDFs. `content/news.ts` stories, tickers and district
+  dates. `content/athletes.ts` profiles. `content/reels.ts` clips.
+  `content/games.ts`, `spotlight.ts`, `benchmarks.ts`, `fundraising.ts`.
 - Facts come from the school's own sites and say where they came from. Never
   invent a score, an honor or a stat for a real person.
-- Every athlete in the template has `sample: true`. Keep that flag on anything
-  made up; it shows a "Sample profile" tag, turns off contact and adds noindex.
+- Everything invented carries `sample: true` (schools, athletes, games,
+  spotlights, fundraisers, gold card offers, reference recruits). Keep that
+  flag on anything made up; it shows a sample tag and adds noindex. Never put
+  a real player's name next to an invented stat, and never give a real
+  school an invented game score.
 
 ## Writing (always)
 

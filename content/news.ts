@@ -9,6 +9,7 @@ const DIST = { label: 'hillsboroschools.net', url: 'https://www.hillsboroschools
 
 export const news: NewsItem[] = [
   {
+    school: 'hillsboro',
     slug: 'gym-scoreboard-shot-clocks',
     title: 'Competition gym gets a digital scoreboard and shot clocks',
     date: '2026-07-16',
@@ -22,6 +23,7 @@ export const news: NewsItem[] = [
     image: '/media/reels/r10.jpg',
   },
   {
+    school: 'hillsboro',
     slug: 'sports-complex-agreement',
     title: 'Five more years at the Hillsboro Sports Complex',
     date: '2026-07-16',
@@ -35,6 +37,7 @@ export const news: NewsItem[] = [
     image: '/media/reels/r2.jpg',
   },
   {
+    school: 'hillsboro',
     slug: 'honors-gpa-latin-honors',
     title: 'Honors now starts at a 3.5 GPA, and Latin honors are coming',
     date: '2025-12-11',
@@ -47,6 +50,7 @@ export const news: NewsItem[] = [
     source: { label: 'December 11, 2025 board meeting', url: DIST.url },
   },
   {
+    school: 'hillsboro',
     slug: 'toppers-3a-playoffs',
     title: 'Toppers head south for the 3A playoffs',
     sport: 'football',
@@ -59,6 +63,7 @@ export const news: NewsItem[] = [
     image: '/media/reels/r1.jpg',
   },
   {
+    school: 'hillsboro',
     slug: 'boys-soccer-scc-title',
     title: 'Boys soccer goes 9-0 to win the SCC',
     sport: 'boys-soccer',
@@ -70,6 +75,7 @@ export const news: NewsItem[] = [
     image: '/media/reels/r6.jpg',
   },
   {
+    school: 'hillsboro',
     slug: 'boys-golf-returns-to-state',
     title: 'Boys golf returns to state',
     sport: 'boys-golf',
@@ -81,6 +87,7 @@ export const news: NewsItem[] = [
     source: ATH,
   },
   {
+    school: 'hillsboro',
     slug: 'boys-golf-regional-title',
     title: 'Boys golf wins the Windsor regional',
     sport: 'boys-golf',
@@ -92,6 +99,7 @@ export const news: NewsItem[] = [
     source: ATH,
   },
   {
+    school: 'hillsboro',
     slug: 'matoush-ibca-all-state',
     title: 'Matoush named IBCA first-team all-state',
     sport: 'girls-basketball',
@@ -101,6 +109,7 @@ export const news: NewsItem[] = [
     image: '/media/reels/r11.jpg',
   },
   {
+    school: 'hillsboro',
     slug: 'new-athletics-website',
     title: 'Schedules moved to a new athletics site',
     summary: 'Every team schedule, the calendar and photo galleries now live on hiltopperathletics.org, run by Athletic Director Aaron Duff.',
@@ -110,14 +119,70 @@ export const news: NewsItem[] = [
     ],
     source: ATH,
   },
+  // ---- Sample stories for the invented schools. ----
+  {
+    school: 'prairie-bend',
+    slug: 'weight-room-drive',
+    title: 'Weight room drive passes a quarter of its goal',
+    date: '2026-10-10',
+    summary: 'Every head coach at Prairie Bend signed on to the drive for two more squat racks.',
+    body: ['Fifty-eight athletes share one squat rack. The athletic director posted the drive with a vendor quote, and the school board matches 50 cents on the dollar up to $1,500.', 'Sample story, written to show a school news page.'],
+    source: { label: 'Sample story', url: '/fundraise/prairie-bend-weight-room/' },
+    image: '/media/reels/r12.jpg',
+  },
+  {
+    school: 'cedar-fork',
+    slug: 'pruitt-2000',
+    title: 'Pruitt passes 2,000 yards in a 48-27 win',
+    date: '2026-10-10',
+    sport: 'football',
+    summary: 'DeShawn Pruitt ran for 287 yards and four touchdowns against Stonewell.',
+    body: ['Pruitt crossed 2,000 rushing yards in the third quarter and finished the night at 2,311 for the season.', 'Sample story, written to show a school news page.'],
+    source: { label: 'Sample story', url: '/spotlight/' },
+    image: '/media/reels/r2.jpg',
+  },
+  {
+    school: 'kessler-valley',
+    slug: 'harnisch-state',
+    title: 'Harnisch wins the 165-pound state title',
+    date: '2026-02-28',
+    sport: 'wrestling',
+    summary: 'The sophomore finished 44-2 with 31 pins.',
+    body: ['Colt Harnisch won the 3A title at 165 pounds. Both of his losses came at an open tournament against wrestlers from 6A programs.', 'Sample story, written to show a school news page.'],
+    source: { label: 'Sample story', url: '/spotlight/' },
+    image: '/media/reels/r15.jpg',
+  },
+  {
+    school: 'elm-hollow',
+    slug: 'okafor-sectional',
+    title: 'Okafor runs 10.52 at sectionals',
+    date: '2026-05-15',
+    sport: 'track-and-field',
+    summary: 'Jalen Okafor won the 100 and the 200 and qualified for the state final.',
+    body: ['Okafor ran a wind-legal 10.52 in the 100 and 21.33 in the 200.', 'Sample story, written to show a school news page.'],
+    source: { label: 'Sample story', url: '/spotlight/' },
+    image: '/media/reels/r13.jpg',
+  },
 ];
 
 /** District calendar dates that move practice and game times. */
 export const events: EventItem[] = [
-  { date: '2026-10-16', title: 'End of 1st quarter', kind: 'school' },
-  { date: '2026-10-30', title: 'Early dismissal', detail: 'School improvement planning. HHS lets out at 11:35 a.m.', kind: 'school' },
-  { date: '2026-11-11', title: 'No school', detail: "Veterans Day", kind: 'school' },
-  { date: '2026-11-25', end: '2026-11-29', title: 'Thanksgiving break', detail: 'No school', kind: 'school' },
+  { school: 'hillsboro', date: '2026-10-16', title: 'End of 1st quarter', kind: 'school' },
+  { school: 'hillsboro', date: '2026-10-30', title: 'Early dismissal', detail: 'School improvement planning. HHS lets out at 11:35 a.m.', kind: 'school' },
+  { school: 'hillsboro', date: '2026-11-11', title: 'No school', detail: "Veterans Day", kind: 'school' },
+  { school: 'hillsboro', date: '2026-11-25', end: '2026-11-29', title: 'Thanksgiving break', detail: 'No school', kind: 'school' },
 ];
 
 export const newsBySlug = (slug: string) => news.find((n) => n.slug === slug);
+
+/** Results crawl under each school's hero. Hillsboro's come from its own posts. */
+export const tickers: Record<string, string[]> = {
+  hillsboro: [
+    'Boys soccer 9-0 in the SCC',
+    'Boys soccer 4, Litchfield 0',
+    'Football into the 3A playoffs',
+    'Boys golf back to state',
+    'Matoush IBCA all-state first team',
+    'Eickhoff regional medalist',
+  ],
+};

@@ -1,4 +1,4 @@
-import type { Athlete } from './types';
+import type { Athlete, School } from './types';
 
 // The recruiting board's filters. Pure, so tools/filters.test.ts can run it,
 // and round-trips through the URL so a coach can bookmark or send a search.
@@ -15,12 +15,16 @@ export type Filters = {
   minWeight: number; // lb, 0 = any
   maxWeight: number; // lb, 0 = any
   ncaa: boolean; // only NCAA-registered
+  school: string; // '' = any
+  state: string; // '' = any
+  classes: string[]; // empty = any, e.g. ['1A', '2A']
+  verified: boolean; // only coach- or reporter-verified stats
   sort: SortKey;
   dir: 'asc' | 'desc';
 };
 
 export const EMPTY: Filters = {
-  q: '', sport: '', grad: [], minGpa: 0, minHeight: 0, maxHeight: 0, minWeight: 0, maxWeight: 0, ncaa: false, sort: 'gpa', dir: 'desc',
+  q: '', sport: '', grad: [], minGpa: 0, minHeight: 0, maxHeight: 0, minWeight: 0, maxWeight: 0, ncaa: false, school: '', state: '', classes: [], verified: false, sort: 'gpa', dir: 'desc',
 };
 
 const num = (v: string | null) => {
@@ -41,6 +45,10 @@ export function parseFilters(params: URLSearchParams): Filters {
     minWeight: num(params.get('wmin')),
     maxWeight: num(params.get('wmax')),
     ncaa: params.get('ncaa') === '1',
+    school: (params.get('school') ?? '').slice(0, 60),
+    state: (params.get('state') ?? '').toUpperCase().slice(0, 2),
+    classes: (params.get('class') ?? '').split(',').filter((c) => /^[1-6]A$/.test(c)),
+    verified: params.get('verified') === '1',
     sort: sort && SORTS.includes(sort) ? sort : EMPTY.sort,
     dir: params.get('dir') === 'asc' ? 'asc' : params.get('dir') === 'desc' ? 'desc' : EMPTY.dir,
   };
@@ -58,13 +66,17 @@ export function serializeFilters(f: Filters): string {
   if (f.minWeight) p.set('wmin', String(f.minWeight));
   if (f.maxWeight) p.set('wmax', String(f.maxWeight));
   if (f.ncaa) p.set('ncaa', '1');
+  if (f.school) p.set('school', f.school);
+  if (f.state) p.set('state', f.state);
+  if (f.classes.length) p.set('class', [...f.classes].sort().join(','));
+  if (f.verified) p.set('verified', '1');
   if (f.sort !== EMPTY.sort) p.set('sort', f.sort);
   if (f.dir !== EMPTY.dir) p.set('dir', f.dir);
   return p.toString();
 }
 
 export function activeCount(f: Filters): number {
-  return [f.q.trim(), f.sport, f.grad.length, f.minGpa, f.minHeight || f.maxHeight, f.minWeight || f.maxWeight, f.ncaa].filter(Boolean).length;
+  return [f.q.trim(), f.sport, f.grad.length, f.minGpa, f.minHeight || f.maxHeight, f.minWeight || f.maxWeight, f.ncaa, f.school, f.state, f.classes.length, f.verified].filter(Boolean).length;
 }
 
 const sortValue = (a: Athlete, key: SortKey): number | string => {
@@ -77,7 +89,7 @@ const sortValue = (a: Athlete, key: SortKey): number | string => {
   }
 };
 
-export function applyFilters(list: readonly Athlete[], f: Filters): Athlete[] {
+export function applyFilters(list: readonly Athlete[], f: Filters, schoolsBySlug: (slug: string) => School | undefined = () => undefined): Athlete[] {
   const q = f.q.trim().toLowerCase();
   const out = list.filter((a) => {
     if (q && !`${a.first} ${a.last} ${a.position} ${a.hometown} ${a.intendedMajor ?? ''}`.toLowerCase().includes(q)) return false;
@@ -89,6 +101,13 @@ export function applyFilters(list: readonly Athlete[], f: Filters): Athlete[] {
     if (f.minWeight && a.weightLb < f.minWeight) return false;
     if (f.maxWeight && a.weightLb > f.maxWeight) return false;
     if (f.ncaa && a.ncaaEligibility !== 'Registered') return false;
+    if (f.school && a.school !== f.school) return false;
+    if (f.verified && !a.verified) return false;
+    if (f.state || f.classes.length) {
+      const s = schoolsBySlug(a.school);
+      if (f.state && s?.state !== f.state) return false;
+      if (f.classes.length && (!s || !f.classes.includes(s.classification))) return false;
+    }
     return true;
   });
   const sign = f.dir === 'asc' ? 1 : -1;

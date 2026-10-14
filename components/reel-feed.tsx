@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowLeft, CaretDown, CaretUp, Check, Heart, Play, ShareFat, SpeakerHigh, SpeakerSlash, User } from '@phosphor-icons/react';
+import { ArrowLeft, CaretDown, CaretUp, Check, Heart, Play, X, ShareFat, SpeakerHigh, SpeakerSlash, User } from '@phosphor-icons/react';
 import { reels as ALL } from '@/content/reels';
 import { athleteBySlug, fullName } from '@/content/athletes';
 import { sportBySlug } from '@/content/sports';
+import { schoolBySlug, schoolTheme } from '@/content/schools';
 import { feetInches, shortDate } from '@/lib/format';
 import { asset } from '@/lib/asset';
 import type { Reel } from '@/lib/types';
@@ -23,12 +24,18 @@ export function ReelFeed() {
   const [muted, setMuted] = useState(true);
   const [likes, setLikes] = useState<Set<string>>(new Set());
   const feed = useRef<HTMLDivElement>(null);
-  const list = useMemo(() => (sport ? ALL.filter((r) => r.sport === sport) : ALL), [sport]);
+  const [school, setSchool] = useState('');
+  const list = useMemo(
+    () => ALL.filter((r) => (!sport || r.sport === sport) && (!school || (r.athlete && athleteBySlug(r.athlete)?.school === school))),
+    [sport, school],
+  );
 
   useEffect(() => {
     // Browser-only state (URL, storage, APIs) is read after hydration so the static HTML matches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLikes(readLikes());
+    const sc = new URLSearchParams(window.location.search).get('school');
+    if (sc && schoolBySlug(sc)) setSchool(sc);
   }, []);
   useEffect(() => {
     const html = document.documentElement;
@@ -100,6 +107,11 @@ export function ReelFeed() {
             <ArrowLeft size={20} />
           </Link>
           <div className="no-scrollbar flex gap-2 overflow-x-auto py-1" role="group" aria-label="Filter reels by sport">
+            {school && (
+              <button type="button" className="chip shrink-0 whitespace-nowrap backdrop-blur" aria-pressed onClick={() => setSchool('')} aria-label={`Showing ${schoolBySlug(school)?.town} only. Show every school`}>
+                {schoolBySlug(school)?.town} <X size={12} weight="bold" />
+              </button>
+            )}
             <button type="button" className="chip shrink-0 backdrop-blur aria-[pressed=false]:bg-ink/50" aria-pressed={sport === ''} onClick={() => setSport('')}>All</button>
             {SPORTS.map((s) => (
               <button key={s} type="button" className="chip shrink-0 whitespace-nowrap backdrop-blur aria-[pressed=false]:bg-ink/50" aria-pressed={sport === s} onClick={() => setSport(s)}>
@@ -110,7 +122,14 @@ export function ReelFeed() {
         </div>
       </div>
 
-      <div ref={feed} data-lenis-prevent className="reel-feed no-scrollbar h-full overflow-y-scroll" aria-label="Highlight reels" key={sport}>
+      <div ref={feed} data-lenis-prevent className="reel-feed no-scrollbar h-full overflow-y-scroll" aria-label="Highlight reels" key={sport + school}>
+        {list.length === 0 && (
+          <div className="flex h-full flex-col items-center justify-center px-6 text-center">
+            <p className="display text-4xl">No clips here yet</p>
+            <p className="mt-3 max-w-sm text-mute">Coaches and families add film from the coach dashboard.</p>
+            <button type="button" className="btn btn-primary mt-6" onClick={() => { setSport(''); setSchool(''); }}>Show every clip</button>
+          </div>
+        )}
         {list.map((r, i) => (
           <ReelSlide key={r.id} reel={r} index={i} active={i === active} near={Math.abs(i - active) <= 1} muted={muted} onMute={() => setMuted((m) => !m)} liked={likes.has(r.id)} onLike={(force) => toggleLike(r.id, force)} />
         ))}
@@ -173,7 +192,7 @@ function ReelSlide({ reel, index, active, near, muted, onMute, liked, onLike }: 
   const railBtn = 'inline-flex h-12 w-12 items-center justify-center rounded-full bg-ink/50 backdrop-blur transition-transform active:scale-90';
 
   return (
-    <section id={reel.id} data-index={index} className="relative flex h-[100svh] w-full items-center justify-center overflow-hidden" aria-label={`${a ? fullName(a) + ', ' : ''}${reel.title}`}>
+    <section id={reel.id} data-index={index} style={a && schoolBySlug(a.school) ? (schoolTheme(schoolBySlug(a.school)!) as React.CSSProperties) : undefined} className="relative flex h-[100svh] w-full items-center justify-center overflow-hidden" aria-label={`${a ? fullName(a) + ', ' : ''}${reel.title}`}>
       {/* Desktop: blurred poster fills the sides around the 9:16 frame. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={asset(reel.poster)} alt="" aria-hidden className="absolute inset-0 hidden h-full w-full scale-110 object-cover opacity-40 blur-2xl md:block" />
@@ -202,7 +221,7 @@ function ReelSlide({ reel, index, active, near, muted, onMute, liked, onLike }: 
         </AnimatePresence>
         <AnimatePresence>
           {burst > 0 && (
-            <motion.span key={burst} initial={{ opacity: 0, scale: 0.4, rotate: -12 }} animate={{ opacity: [0, 1, 1, 0], scale: [0.4, 1.2, 1, 1.4], rotate: [-12, 6, 0, 0] }} transition={{ duration: 0.9, times: [0, 0.25, 0.6, 1] }} className="pointer-events-none absolute left-1/2 top-1/2 z-[2] -ml-14 -mt-14 text-orange">
+            <motion.span key={burst} initial={{ opacity: 0, scale: 0.4, rotate: -12 }} animate={{ opacity: [0, 1, 1, 0], scale: [0.4, 1.2, 1, 1.4], rotate: [-12, 6, 0, 0] }} transition={{ duration: 0.9, times: [0, 0.25, 0.6, 1] }} className="pointer-events-none absolute left-1/2 top-1/2 z-[2] -ml-14 -mt-14 text-accent">
               <Heart size={112} weight="fill" />
             </motion.span>
           )}
@@ -210,13 +229,14 @@ function ReelSlide({ reel, index, active, near, muted, onMute, liked, onLike }: 
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-ink via-ink/80 to-transparent px-4 pb-8 pt-36 [text-shadow:0_1px_2px_rgb(0_0_0/0.6)] md:pb-6">
           <div className="pointer-events-auto max-w-[78%]">
-            <p className="text-sm font-semibold text-orange-2">{sport?.name} · {shortDate(reel.date)}</p>
+            <p className="text-sm font-semibold text-accent-2">{sport?.name} · {shortDate(reel.date)}</p>
             {a && (
               <Link href={`/athletes/${a.slug}/`} className="mt-1 inline-block">
-                <h2 className="display text-4xl leading-none text-bone hover:text-orange">{fullName(a)}</h2>
+                <h2 className="display text-4xl leading-none text-bone hover:text-accent">{fullName(a)}</h2>
                 <span className="mt-1 block text-sm text-mute">{a.gradYear} · {a.position} · {feetInches(a.heightIn)} · {a.weightLb} lb</span>
               </Link>
             )}
+            {a && <p className="text-sm text-bone/85">{schoolBySlug(a.school)?.name} · {schoolBySlug(a.school)?.state} {schoolBySlug(a.school)?.classification}</p>}
             <p className="mt-2 text-bone">{reel.title}</p>
             {reel.credit && <p className="mt-1 text-xs text-bone/80">{reel.credit}</p>}
           </div>
@@ -225,13 +245,13 @@ function ReelSlide({ reel, index, active, near, muted, onMute, liked, onLike }: 
         <div className="absolute bottom-24 right-3 z-[3] flex flex-col items-center gap-5 md:bottom-20">
           {a && (
             <Link href={`/athletes/${a.slug}/`} className={rail} aria-label={`Open ${fullName(a)}'s profile`}>
-              <span className="display inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-orange bg-ink text-xl text-orange">{a.jersey}</span>
+              <span className="display inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent bg-ink text-xl text-accent">{a.jersey}</span>
               <span className="inline-flex items-center gap-0.5"><User size={12} /> Profile</span>
             </Link>
           )}
           <button type="button" className={rail} onClick={() => onLike()} aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'}>
             <motion.span className={railBtn} animate={liked ? { scale: [1, 1.25, 1] } : { scale: 1 }}>
-              <Heart size={26} weight={liked ? 'fill' : 'regular'} className={liked ? 'text-orange' : ''} />
+              <Heart size={26} weight={liked ? 'fill' : 'regular'} className={liked ? 'text-accent' : ''} />
             </motion.span>
             <span>{liked ? 'Liked' : 'Like'}</span>
           </button>
@@ -246,7 +266,7 @@ function ReelSlide({ reel, index, active, near, muted, onMute, liked, onLike }: 
         </div>
 
         <div className="absolute inset-x-0 bottom-0 z-[4] h-0.5 bg-bone/15">
-          <div ref={bar} className="h-full origin-left bg-orange" style={{ transform: 'scaleX(0)' }} />
+          <div ref={bar} className="h-full origin-left bg-accent" style={{ transform: 'scaleX(0)' }} />
         </div>
       </div>
       {index === 0 && active && (

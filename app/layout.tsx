@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Barlow, Big_Shoulders, Geist_Mono } from 'next/font/google';
-import { site } from '@/content/site';
+import { platform } from '@/content/platform';
 import { Nav } from '@/components/nav';
-import { Footer } from '@/components/footer';
 import { SmoothScroll } from '@/components/smooth-scroll';
 import { asset } from '@/lib/asset';
 import './globals.css';
@@ -12,10 +11,10 @@ const sans = Barlow({ subsets: ['latin'], weight: ['400', '500', '600', '700'], 
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: { default: `${site.name} | ${site.school} Athletics`, template: `%s | ${site.name}` },
-  description: `Scores, stats, film and recruiting profiles for ${site.school} athletes in ${site.city}.`,
-  openGraph: { type: 'website', siteName: site.name, images: [asset('/brand/og.jpg')] },
+  metadataBase: new URL(platform.url),
+  title: { default: `${platform.name} | Small-school athletes, seen`, template: `%s | ${platform.name}` },
+  description: 'Recruiting profiles, verified stats, game-day scores and film for athletes at 1A to 4A high schools.',
+  openGraph: { type: 'website', siteName: platform.name, images: [asset('/brand/og.jpg')] },
   twitter: { card: 'summary_large_image' },
   icons: { icon: asset('/brand/Hillsboro.png'), apple: asset('/brand/Hillsboro.png') },
 };
@@ -31,8 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <SmoothScroll />
         <Nav />
-        <main id="main">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

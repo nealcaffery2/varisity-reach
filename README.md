@@ -1,32 +1,47 @@
-# Hillsboro Hiltoppers
+# Varsity Reach
 
-The athletics site for Hillsboro High School in Hillsboro, Illinois. Black and
-orange, built for three people: the college coach looking for a player, the
-athlete sending their profile, and the town following the Toppers.
+Recruiting exposure for athletes at 1A to 4A high schools. Every school gets
+its own site in its colors (Hillsboro Hiltoppers is the first real one), and
+all of them feed one recruit board, one reel feed and one game-day network.
 
 **What's in it**
 
-- **Home:** full-screen hero film, results ticker, a draggable highlights rail,
-  the fifteen teams by season (hover a team to preview its clip), a pinned
-  sideways pan through featured athletes, and the vertical reels.
-- **Recruit board** (`/athletes/`): filter by sport, class, minimum GPA, height
-  and weight range, NCAA registration, or search by name, position, town or
-  major. Card or table view. The search lives in the URL, so "Share search"
-  sends a coach's staff the exact list.
-- **Athlete profiles:** class, height, weight, GPA and test score up top;
-  season-by-season stats, measurables, personal records, honors, academics,
-  NCAA status, a scouting note and film. Share sheet, copy link, X, Facebook,
-  email, a QR code for showcase tables, and a print layout that makes a
-  one-page recruiting sheet.
-- **Reels** (`/reels/`): a phone-style vertical feed. Swipe or use arrow keys,
-  tap to pause, double-tap to like, share a clip, tap the jersey to open the
-  athlete. Filter by sport.
-- **Stats:** leaders and sortable tables for every sport with numbers on file.
-- **Teams, news, schedule:** coaches as listed by the HHS athletics office,
-  2026-27 schedule PDFs, and stories written from the school's own posts with a
-  link back to each source.
+- **School sites** (`/hillsboro/`, `/prairie-bend/`...): hero film, results
+  ticker, highlights rail, teams by season with hover clips, featured athletes,
+  reels, fundraisers, district dates. Re-skinned per school from
+  `content/schools.ts`, ready to link from the district's athletics page.
+- **Recruit board** (`/recruits/`): filter by sport, state, school size
+  (1A to 4A), school, class, GPA, height, weight, NCAA status and
+  coach-verified stats. Card or table view; the search lives in the URL.
+- **Athlete profiles:** measurables, academics, season stats, records, honors,
+  film, a "verified by coach" mark, share sheet, QR, a one-page print layout,
+  and **Compare** against a highly rated recruit.
+- **Spotlight** (`/spotlight/`): player and game spotlights by verified coaches
+  and reporters, and the community-voted **Underdog of the Week**.
+- **Game day** (`/games/`): an ESPN-style score bar fed by **community
+  scoring**. Fans report from the stands; reports are weighted by role, track
+  record, scoreboard-photo proof and freshness; a verified coach or scorer can
+  lock it; fakers lose weight after every final (`lib/consensus.ts`).
+- **Stream pairing:** paste a YouTube, Facebook or Twitch link and it plays
+  next to the score. Instagram Live and TikTok LIVE do not allow embedding, so
+  those pair as a link, and the streamer adds `/overlay/<game>/` as a browser
+  source in OBS, Streamlabs or Prism to put the live score on their stream.
+- **Coach dashboard** (`/coach/`): drop an Excel, CSV, Word file, PDF or a
+  phone photo of the roster or stat sheet. Spreadsheets parse in the browser;
+  photos and PDFs go to Claude. Every change is listed for approval before it
+  publishes. Coaches also post team needs here.
+- **Fundraising** (`/fundraise/`): Cash for Cleats, buses, camps, equipment.
+  School and coach backing, sponsor matches, milestones that unlock, squad
+  races (class vs class), backer levels, and money paid straight to the
+  school's or booster club's Stripe account.
+- **Gold cards** (`/gold-card/`): a season discount card on your phone with a
+  signed QR code; merchants scan it at `/gold-card/verify/`.
+- **Verification** (`/join/`) for coaches, athletic directors, reporters and
+  official scorers.
 
-Everything is static files. It hosts free on GitHub Pages, Vercel or Netlify.
+Everything is a static site. Without a backend it runs in **demo mode**: every
+flow works, writes stay in the visitor's browser, and the pages say so. Connect
+Supabase (see `supabase/README.md`) and the same pages go live.
 
 ## Run it
 
@@ -36,17 +51,23 @@ pnpm dev                 # http://localhost:3000
 pnpm build               # static site in out/
 ```
 
-Checks (CI runs all of them):
+Checks (CI runs all of them, plus a Deno type-check of the functions and the
+migrations applied twice to a fresh Postgres):
 
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm check:copy
 ```
 
+Sample data: every school except Hillsboro, every athlete, game, spotlight,
+fundraiser, gold card offer and reference recruit is invented and marked
+`sample: true`. Sample pages carry a visible tag and a noindex. Hillsboro's
+coaches, schedules and news come from the school's own sites.
+
 ## Add a real athlete
 
 1. Get a signed media release from the family. Publish only what they approve.
    Never publish a home address, a phone number or a personal email.
-2. Open `content/athletes.ts`, copy an entry, and set `sample: false`.
+2. Use the coach dashboard, or open `content/athletes.ts`, copy an entry, and set `sample: false`.
 3. Fill it in from the transcript (unweighted GPA, ACT or SAT), the coach's
    stat book (`seasons`), and testing day (`measurables`, `records`). Stat keys
    for each sport are listed in `content/sports.ts`.
@@ -107,6 +128,11 @@ district's sites are the official record.
 | Desktop | Phone |
 | --- | --- |
 | ![Home](docs/screenshots/desktop-home.jpg) | ![Home](docs/screenshots/phone-home.jpg) |
-| ![Recruit board](docs/screenshots/desktop-athletes.jpg) | ![Recruit board](docs/screenshots/phone-athletes.jpg) |
-| ![Profile](docs/screenshots/desktop-athletes-cade-rakers.jpg) | ![Profile](docs/screenshots/phone-athletes-cade-rakers.jpg) |
-| ![Reels](docs/screenshots/desktop-reels.jpg) | ![Reels](docs/screenshots/phone-reels.jpg) |
+| ![Hillsboro site](docs/screenshots/desktop-school-hillsboro.jpg) | ![Hillsboro site](docs/screenshots/phone-school-hillsboro.jpg) |
+| ![Recruit board](docs/screenshots/desktop-recruits.jpg) | ![Recruit board](docs/screenshots/phone-recruits.jpg) |
+| ![Profile](docs/screenshots/desktop-profile.jpg) | ![Profile](docs/screenshots/phone-profile.jpg) |
+| ![Game center](docs/screenshots/desktop-game.jpg) | ![Report a score](docs/screenshots/phone-game-report.jpg) |
+| ![Compare](docs/screenshots/desktop-compare.jpg) | ![Compare](docs/screenshots/phone-compare.jpg) |
+| ![Roster import](docs/screenshots/desktop-coach-review.jpg) | ![Roster import](docs/screenshots/phone-coach-review.jpg) |
+| ![Fundraiser](docs/screenshots/desktop-fundraiser.jpg) | ![Gold card](docs/screenshots/phone-gold-card.jpg) |
+| ![Spotlight](docs/screenshots/desktop-spotlight.jpg) | ![Reels](docs/screenshots/phone-reels.jpg) |

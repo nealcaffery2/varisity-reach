@@ -68,7 +68,7 @@ export function Slider({ children, label, title }: { children: ReactNode; label:
       </div>
       <div className="wrap mt-6">
         <div className="h-px w-full bg-line">
-          <motion.div className="h-px origin-left bg-orange" style={{ scaleX: scrollXProgress }} />
+          <motion.div className="h-px origin-left bg-accent" style={{ scaleX: scrollXProgress }} />
         </div>
       </div>
     </div>

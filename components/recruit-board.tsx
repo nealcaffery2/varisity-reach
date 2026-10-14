@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ArrowDown, ArrowUp, Check, FunnelSimple, LinkSimple, Rows, SquaresFour, X } from '@phosphor-icons/react';
 import { athletes, fullName } from '@/content/athletes';
 import { sports, sportBySlug } from '@/content/sports';
+import { schools, schoolBySlug } from '@/content/schools';
 import { EMPTY, activeCount, applyFilters, parseFilters, serializeFilters, type Filters, type SortKey } from '@/lib/filters';
 import { feetInches, gpa } from '@/lib/format';
 import { AthleteCard } from './athlete-card';
@@ -13,6 +14,8 @@ import { AthleteCard } from './athlete-card';
 const YEARS = [...new Set(athletes.map((a) => a.gradYear))].sort();
 const HEIGHTS = Array.from({ length: 25 }, (_, i) => 60 + i); // 5'0" to 7'0"
 const SPORTS_ON_BOARD = sports.filter((s) => athletes.some((a) => a.sports.includes(s.slug)));
+const STATES = [...new Set(schools.map((s) => s.state))].sort();
+const CLASSES = [...new Set(schools.map((s) => s.classification))].sort();
 
 export function RecruitBoard() {
   const [f, setF] = useState<Filters>(EMPTY);
@@ -37,7 +40,7 @@ export function RecruitBoard() {
     try { localStorage.setItem('board-view', view); } catch {}
   }, [view]);
 
-  const results = useMemo(() => applyFilters(athletes, f), [f]);
+  const results = useMemo(() => applyFilters(athletes, f, schoolBySlug), [f]);
   const n = activeCount(f);
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setF((x) => ({ ...x, [k]: v }));
 
@@ -67,8 +70,37 @@ export function RecruitBoard() {
           {SPORTS_ON_BOARD.map((s) => <option key={s.slug} value={s.slug}>{s.name}</option>)}
         </select>
       </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label htmlFor="school" className="field-label">School</label>
+          <select id="school" className="field" value={f.school} onChange={(e) => set('school', e.target.value)}>
+            <option value="">Any</option>
+            {schools.map((s) => <option key={s.slug} value={s.slug}>{s.town}</option>)}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="state" className="field-label">State</label>
+          <select id="state" className="field" value={f.state} onChange={(e) => set('state', e.target.value)}>
+            <option value="">Any</option>
+            {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+      </div>
       <fieldset>
-        <legend className="field-label">Class</legend>
+        <legend className="field-label">School size</legend>
+        <div className="flex flex-wrap gap-2">
+          {CLASSES.map((c) => {
+            const on = f.classes.includes(c);
+            return (
+              <button key={c} type="button" className="chip" aria-pressed={on} onClick={() => set('classes', on ? f.classes.filter((x) => x !== c) : [...f.classes, c])}>
+                {on && <Check size={12} weight="bold" />}{c}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend className="field-label">Grad year</legend>
         <div className="flex flex-wrap gap-2">
           {YEARS.map((y) => {
             const on = f.grad.includes(y);
@@ -115,6 +147,10 @@ export function RecruitBoard() {
         <input type="checkbox" className="h-4 w-4" checked={f.ncaa} onChange={(e) => set('ncaa', e.target.checked)} />
         NCAA Eligibility Center registered
       </label>
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-bone">
+        <input type="checkbox" className="h-4 w-4" checked={f.verified} onChange={(e) => set('verified', e.target.checked)} />
+        Stats verified by a coach or reporter
+      </label>
       <button type="button" className="btn btn-ghost w-full" onClick={() => setF(EMPTY)} disabled={n === 0}>Clear filters</button>
     </div>
   );
@@ -143,7 +179,7 @@ export function RecruitBoard() {
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" className="btn btn-ghost lg:hidden" onClick={() => setSheet(true)}>
-              <FunnelSimple size={18} /> Filters{n > 0 && <span className="num rounded-full bg-orange px-1.5 text-xs text-orange-ink">{n}</span>}
+              <FunnelSimple size={18} /> Filters{n > 0 && <span className="num rounded-full bg-accent px-1.5 text-xs text-accent-ink">{n}</span>}
             </button>
             <select aria-label="Sort by" className="field h-11 w-auto" value={`${f.sort}:${f.dir}`} onChange={(e) => { const [s, d] = e.target.value.split(':'); setF((x) => ({ ...x, sort: s as SortKey, dir: d as 'asc' | 'desc' })); }}>
               <option value="gpa:desc">GPA, high to low</option>
@@ -184,11 +220,12 @@ export function RecruitBoard() {
           </motion.ul>
         ) : (
           <div className="mt-6 overflow-x-auto rounded border border-line" data-lenis-prevent>
-            <table className="w-full min-w-[52rem] text-sm">
+            <table className="w-full min-w-[60rem] text-sm">
               <caption className="sr-only">Recruits matching the current filters</caption>
               <thead className="border-b border-line bg-ink-2">
                 <tr>
                   {th('name', 'Athlete')}
+                  {th(null, 'School')}
                   {th(null, 'Sport')}
                   {th(null, 'Pos')}
                   {th('grad', 'Class')}
@@ -206,12 +243,13 @@ export function RecruitBoard() {
                       <Link href={`/athletes/${a.slug}/`} className="link-u font-semibold text-bone">{fullName(a)}</Link>
                       {a.sample && <span className="ml-2 text-xs text-dim">sample</span>}
                     </td>
+                    <td className="px-4 py-3 text-mute">{schoolBySlug(a.school)?.town} <span className="text-dim">{schoolBySlug(a.school)?.state} {schoolBySlug(a.school)?.classification}</span></td>
                     <td className="px-4 py-3 text-mute">{sportBySlug(a.sports[0])?.short}</td>
                     <td className="px-4 py-3 text-mute">{a.position}</td>
                     <td className="num px-4 py-3 text-mute">{a.gradYear}</td>
                     <td className="num px-4 py-3 text-right text-bone">{feetInches(a.heightIn)}</td>
                     <td className="num px-4 py-3 text-right text-bone">{a.weightLb}</td>
-                    <td className="num px-4 py-3 text-right text-orange">{gpa(a.gpa)}</td>
+                    <td className="num px-4 py-3 text-right text-accent">{gpa(a.gpa)}</td>
                     <td className="num px-4 py-3 text-right text-bone">{a.act ?? '–'}</td>
                     <td className="px-4 py-3 text-mute">{a.ncaaEligibility ?? '–'}</td>
                   </tr>

@@ -1,7 +1,7 @@
 import next from 'eslint-config-next';
 
 const config = [
-  { ignores: ['.next/**', 'out/**', 'node_modules/**', '.claude/**', 'next-env.d.ts'] },
+  { ignores: ['.next/**', 'out/**', 'node_modules/**', '.claude/**', 'supabase/**', 'next-env.d.ts'] },
   ...next,
 ];
 

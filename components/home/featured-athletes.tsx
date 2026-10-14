@@ -11,7 +11,7 @@ import { AthleteCard } from '@/components/athlete-card';
  * slide left as you scroll down. Phones and reduced motion get a plain
  * swipeable row instead.
  */
-export function FeaturedAthletes({ list }: { list: Athlete[] }) {
+export function FeaturedAthletes({ list, more = '/recruits/', title = 'On the board' }: { list: Athlete[]; more?: string; title?: string }) {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -41,8 +41,8 @@ export function FeaturedAthletes({ list }: { list: Athlete[] }) {
 
   const heading = (
     <div className="wrap flex items-end justify-between gap-6">
-      <h2 id="featured-h" className="display text-5xl sm:text-6xl md:text-8xl">On the board</h2>
-      <Link href="/athletes/" className="btn btn-ghost hidden md:inline-flex">All recruits</Link>
+      <h2 id="featured-h" className="display text-5xl sm:text-6xl md:text-8xl">{title}</h2>
+      <Link href={more} className="btn btn-ghost hidden md:inline-flex">All recruits</Link>
     </div>
   );
 
@@ -55,7 +55,7 @@ export function FeaturedAthletes({ list }: { list: Athlete[] }) {
             <div key={a.slug} className="snap-start"><AthleteCard a={a} size="lg" /></div>
           ))}
         </div>
-        <div className="wrap mt-8 md:hidden"><Link href="/athletes/" className="btn btn-ghost w-full">All recruits</Link></div>
+        <div className="wrap mt-8 md:hidden"><Link href={more} className="btn btn-ghost w-full">All recruits</Link></div>
       </section>
     );
   }
@@ -70,7 +70,7 @@ export function FeaturedAthletes({ list }: { list: Athlete[] }) {
           ))}
         </motion.div>
         <div className="wrap mt-10">
-          <div className="h-px bg-line"><motion.div style={{ scaleX: bar }} className="h-px origin-left bg-orange" /></div>
+          <div className="h-px bg-line"><motion.div style={{ scaleX: bar }} className="h-px origin-left bg-accent" /></div>
         </div>
       </div>
     </section>

@@ -98,13 +98,9 @@ page: who, what, the score, the date. The copy check catches the rest.
 
 ## Deploy
 
-**GitHub Pages:** push to `main`, then Settings → Pages → Source: GitHub
-Actions. `.github/workflows/pages.yml` builds with the repo name as the base
-path. For a custom domain, set the repo variable `BASE_PATH` to an empty value
-and `SITE_URL` to the domain.
-
-**Vercel or Netlify:** import the repo, build command `pnpm build`, output
-directory `out`.
+The site runs on Vercel (varisity-reach.vercel.app). Every push to `main`
+deploys, and each pull request gets a preview link. Build command `pnpm build`,
+output directory `out`.
 
 ## Design and writing rules
 
